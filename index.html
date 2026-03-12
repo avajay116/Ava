@@ -3,561 +3,657 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RealtorHunter — Realtor Intelligence Platform</title>
+<title>RealtorHunter</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  :root{--cream:#FAFAF8;--off-white:#F5F3EF;--light-brown:#C4A882;--mid-brown:#8B6F47;--dark-brown:#5C4033;--espresso:#2C1810;--charcoal:#1A1A1A;--warm-gray:#9A9590;--soft-gray:#E8E5E0;--accent-gold:#D4A853;--white:#FFFFFF;--font-display:'Playfair Display',serif;--font-body:'DM Sans',sans-serif;}
-  body{font-family:var(--font-body);background:var(--cream);color:var(--charcoal);min-height:100vh;font-size:14px}
-  .onboarding-overlay{position:fixed;inset:0;background:var(--espresso);display:flex;align-items:center;justify-content:center;z-index:1000;padding:1rem}
-  .onboarding-overlay.hidden{display:none}
-  .onboarding-card{background:var(--cream);border-radius:20px;padding:2.5rem;max-width:460px;width:100%;text-align:center}
-  .ob-logo{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:1.5rem}
-  .ob-logo-icon{width:44px;height:44px;background:var(--espresso);border-radius:12px;display:flex;align-items:center;justify-content:center}
-  .ob-logo-icon svg{width:22px;height:22px;fill:var(--light-brown)}
-  .ob-logo-text{font-family:var(--font-display);color:var(--espresso);font-size:24px;font-weight:500}
-  .ob-title{font-family:var(--font-display);font-size:20px;color:var(--espresso);margin-bottom:6px}
-  .ob-sub{font-size:13px;color:var(--warm-gray);margin-bottom:1.5rem;line-height:1.6}
-  .ob-features{display:flex;flex-direction:column;gap:8px;text-align:left;margin-bottom:1.5rem;background:var(--off-white);border-radius:12px;padding:1rem}
-  .ob-feature{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--charcoal)}
-  .ob-divider{height:1px;background:var(--soft-gray);margin:1.25rem 0}
-  .ob-field{margin-bottom:1rem;text-align:left}
-  .ob-label{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--mid-brown);font-weight:600;margin-bottom:5px;display:block}
-  .ob-input{width:100%;background:var(--white);border:1.5px solid var(--soft-gray);border-radius:10px;padding:11px 14px;font-family:var(--font-body);font-size:14px;color:var(--charcoal);outline:none;transition:border-color 0.2s}
-  .ob-input:focus{border-color:var(--light-brown)}
-  .ob-input::placeholder{color:#C0BAB2}
-  .ob-btn{width:100%;background:var(--espresso);color:var(--white);border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-body);margin-top:4px;transition:background 0.2s}
-  .ob-btn:hover{background:var(--dark-brown)}
-  .ob-note{font-size:11px;color:var(--warm-gray);margin-top:10px}
-  .header{background:var(--espresso);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;border-bottom:1px solid rgba(196,168,130,0.3)}
-  .logo{display:flex;align-items:center;gap:12px}
-  .logo-icon{width:36px;height:36px;background:var(--light-brown);border-radius:8px;display:flex;align-items:center;justify-content:center}
-  .logo-icon svg{width:18px;height:18px;fill:var(--espresso)}
-  .logo-text{font-family:var(--font-display);color:var(--white);font-size:18px;font-weight:500}
-  .logo-sub{color:var(--light-brown);font-size:11px;font-weight:300;letter-spacing:0.08em;text-transform:uppercase;margin-top:1px}
-  .header-meta{display:flex;align-items:center;gap:10px}
-  .header-tag{background:rgba(196,168,130,0.15);border:1px solid rgba(196,168,130,0.3);color:var(--light-brown);font-size:11px;padding:5px 12px;border-radius:20px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .header-edit-btn{background:transparent;border:1px solid rgba(196,168,130,0.3);color:var(--light-brown);font-size:11px;padding:5px 10px;border-radius:20px;cursor:pointer;font-family:var(--font-body)}
-  .search-section{background:var(--dark-brown);padding:1.5rem 2rem;border-bottom:1px solid rgba(196,168,130,0.2)}
-  .search-wrap{max-width:900px;margin:0 auto;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
-  .search-group{flex:1;min-width:130px}
-  .search-label{color:var(--light-brown);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;display:block}
-  .search-input{width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(196,168,130,0.3);border-radius:8px;padding:10px 14px;color:var(--white);font-family:var(--font-body);font-size:14px;outline:none}
-  .search-input::placeholder{color:rgba(255,255,255,0.35)}
-  .search-input:focus{border-color:var(--light-brown)}
-  .search-select{width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(196,168,130,0.3);border-radius:8px;padding:10px 14px;color:var(--white);font-family:var(--font-body);font-size:14px;outline:none;cursor:pointer}
-  .search-select option{background:var(--dark-brown)}
-  .search-btn{background:var(--light-brown);color:var(--espresso);font-family:var(--font-body);font-weight:600;font-size:13px;padding:10px 24px;border:none;border-radius:8px;cursor:pointer;white-space:nowrap;height:42px;transition:background 0.2s}
-  .search-btn:hover{background:var(--accent-gold)}
-  .search-btn:disabled{opacity:0.6;cursor:not-allowed}
-  .stats-bar{background:var(--white);border-bottom:1px solid var(--soft-gray);padding:1rem 2rem;display:flex;gap:2rem;align-items:center;flex-wrap:wrap}
-  .stat-item{text-align:center}
-  .stat-num{font-family:var(--font-display);font-size:22px;color:var(--dark-brown);font-weight:500}
-  .stat-label{font-size:11px;color:var(--warm-gray);text-transform:uppercase;letter-spacing:0.06em;margin-top:2px}
-  .stat-divider{width:1px;height:36px;background:var(--soft-gray)}
-  .filter-row{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .filter-btn{background:var(--off-white);border:1px solid var(--soft-gray);color:var(--charcoal);font-size:12px;padding:6px 14px;border-radius:20px;cursor:pointer;font-family:var(--font-body);transition:all 0.2s}
-  .filter-btn.active{background:var(--dark-brown);color:var(--white);border-color:var(--dark-brown)}
-  .main-layout{display:flex;flex:1;min-height:0}
-  .list-panel{flex:1;padding:1.5rem 2rem;overflow-y:auto;max-height:calc(100vh - 240px)}
-  .section-title{font-family:var(--font-display);font-size:16px;color:var(--espresso);font-weight:500;margin-bottom:1rem}
-  .realtor-grid{display:flex;flex-direction:column;gap:10px}
-  .realtor-card{background:var(--white);border:1px solid var(--soft-gray);border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem;cursor:pointer;transition:all 0.2s}
-  .realtor-card:hover{border-color:var(--light-brown);box-shadow:0 4px 16px rgba(92,64,51,0.08);transform:translateY(-1px)}
-  .realtor-card.selected{border-color:var(--dark-brown);border-width:1.5px;background:var(--off-white)}
-  .realtor-card.contacted{border-left:3px solid var(--accent-gold)}
-  .rank-badge{width:28px;height:28px;background:var(--off-white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--warm-gray);flex-shrink:0}
-  .rank-badge.top{background:var(--dark-brown);color:var(--white)}
-  .avatar{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:16px;font-weight:500;flex-shrink:0;color:var(--white)}
-  .realtor-info{flex:1;min-width:0}
-  .realtor-name{font-weight:600;font-size:14px;color:var(--charcoal);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .realtor-brokerage{font-size:12px;color:var(--warm-gray);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .realtor-tags{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
-  .tag{font-size:10px;padding:3px 8px;border-radius:4px;font-weight:500}
-  .tag-sold{background:#F0EBE3;color:var(--dark-brown)}
-  .tag-listings{background:#EBF0E3;color:#3B6D11}
-  .tag-specialty{background:#E3EBF0;color:#185FA5}
-  .realtor-stats{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
-  .stat-vol{font-family:var(--font-display);font-size:15px;font-weight:500;color:var(--dark-brown)}
-  .stat-deals{font-size:11px;color:var(--warm-gray)}
-  .card-actions{display:flex;gap:6px;flex-shrink:0}
-  .action-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--soft-gray);background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--warm-gray)}
-  .action-btn.primary{background:var(--dark-brown);border-color:var(--dark-brown);color:var(--white)}
-  .detail-panel{width:380px;background:var(--white);border-left:1px solid var(--soft-gray);padding:1.5rem;overflow-y:auto;max-height:calc(100vh - 240px);flex-shrink:0}
-  .panel-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;text-align:center;color:var(--warm-gray)}
-  .panel-empty-title{font-family:var(--font-display);font-size:15px;color:var(--charcoal);margin-top:1rem;margin-bottom:6px}
-  .panel-empty-sub{font-size:12px;line-height:1.5}
-  .detail-header{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--soft-gray)}
-  .detail-avatar{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:20px;font-weight:500;color:var(--white)}
-  .detail-name{font-family:var(--font-display);font-size:18px;font-weight:500;color:var(--espresso)}
-  .detail-brokerage{font-size:12px;color:var(--warm-gray);margin-top:2px}
-  .detail-source{font-size:11px;background:var(--off-white);color:var(--mid-brown);padding:3px 8px;border-radius:4px;margin-top:4px;display:inline-block}
-  .metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.25rem}
-  .metric-card{background:var(--off-white);border-radius:8px;padding:10px 12px}
-  .metric-val{font-family:var(--font-display);font-size:14px;font-weight:500;color:var(--dark-brown);word-break:break-all}
-  .metric-lbl{font-size:11px;color:var(--warm-gray);margin-top:2px;text-transform:uppercase;letter-spacing:0.05em}
-  .detail-section{margin-bottom:1.25rem}
-  .detail-section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--warm-gray);margin-bottom:8px;font-weight:600}
-  .contact-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--off-white);border-radius:8px;margin-bottom:6px;font-size:13px}
-  .script-tabs{display:flex;margin-bottom:10px;border:1px solid var(--soft-gray);border-radius:8px;overflow:hidden}
-  .script-tab{flex:1;padding:7px 10px;font-size:11px;background:var(--white);border:none;cursor:pointer;font-family:var(--font-body);color:var(--warm-gray);text-align:center}
-  .script-tab.active{background:var(--dark-brown);color:var(--white);font-weight:500}
-  .script-box{background:var(--off-white);border-radius:8px;padding:12px;font-size:12px;line-height:1.7;color:var(--charcoal);border:1px solid var(--soft-gray);min-height:100px;white-space:pre-wrap}
-  .copy-btn{width:100%;margin-top:8px;background:var(--dark-brown);color:var(--white);border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-body)}
-  .copy-btn:hover{background:var(--espresso)}
-  .status-row{display:flex;gap:6px;flex-wrap:wrap}
-  .status-chip{font-size:11px;padding:5px 12px;border-radius:20px;cursor:pointer;border:1px solid;font-family:var(--font-body)}
-  .status-chip.not-contacted{background:var(--white);border-color:var(--soft-gray);color:var(--warm-gray)}
-  .status-chip.not-contacted.sel{background:var(--soft-gray);border-color:var(--warm-gray);color:var(--charcoal);font-weight:500}
-  .status-chip.in-progress{background:var(--white);border-color:#E8C97A;color:#7A6020}
-  .status-chip.in-progress.sel{background:#FDF7E5;border-color:#D4A853;color:#7A6020;font-weight:500}
-  .status-chip.partner{background:var(--white);border-color:var(--light-brown);color:var(--dark-brown)}
-  .status-chip.partner.sel{background:#F5EDE0;border-color:var(--dark-brown);color:var(--dark-brown);font-weight:500}
-  .note-input{width:100%;background:var(--off-white);border:1px solid var(--soft-gray);border-radius:8px;padding:10px 12px;font-size:12px;font-family:var(--font-body);color:var(--charcoal);resize:vertical;min-height:70px;outline:none}
-  .save-note-btn{background:var(--light-brown);color:var(--espresso);border:none;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;margin-top:6px;font-family:var(--font-body)}
-  .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--espresso);color:var(--white);padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transform:translateY(8px);transition:all 0.3s;z-index:9999;pointer-events:none;border-left:3px solid var(--light-brown)}
-  .toast.show{opacity:1;transform:translateY(0)}
-  .loading-state{text-align:center;padding:4rem 2rem;color:var(--warm-gray)}
-  .loading-spinner{width:40px;height:40px;border:3px solid var(--soft-gray);border-top-color:var(--dark-brown);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .error-state{text-align:center;padding:3rem;background:#FFF5F5;border-radius:12px;border:1px solid #FFD0D0;margin:1rem}
-  .pag-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--soft-gray)}
-  .pag-btn{background:var(--white);border:1px solid var(--soft-gray);border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:var(--font-body);color:var(--charcoal)}
-  .pag-btn:disabled{opacity:0.35;cursor:default}
-  .pag-info{font-size:12px;color:var(--warm-gray)}
-  .badge-status{font-size:10px;background:var(--accent-gold);color:var(--espresso);padding:2px 7px;border-radius:4px;font-weight:600;margin-left:6px}
-  .realtor-link{font-size:11px;color:var(--mid-brown);text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-top:3px}
-  .realtor-link:hover{color:var(--dark-brown)}
-  @media(max-width:900px){.detail-panel{display:none}.list-panel{padding:1rem}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size:14px;min-height:100vh}
+
+/* ONBOARDING */
+#ob-overlay{position:fixed;inset:0;background:#2C1810;display:flex;align-items:center;justify-content:center;z-index:9999;padding:1rem}
+#ob-card{background:#FAFAF8;border-radius:20px;padding:2.5rem;max-width:460px;width:100%;text-align:center}
+.ob-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:1.5rem}
+.ob-logo-box{width:44px;height:44px;background:#2C1810;border-radius:12px;display:flex;align-items:center;justify-content:center}
+.ob-logo-box svg{width:22px;height:22px;fill:#C4A882}
+.ob-logo-name{font-family:'Playfair Display',serif;font-size:24px;color:#2C1810}
+.ob-title{font-family:'Playfair Display',serif;font-size:20px;color:#2C1810;margin-bottom:6px}
+.ob-sub{font-size:13px;color:#9A9590;margin-bottom:1.25rem;line-height:1.6}
+.ob-features{background:#F5F3EF;border-radius:12px;padding:1rem;margin-bottom:1.25rem;text-align:left;display:flex;flex-direction:column;gap:8px}
+.ob-feat{font-size:12px;color:#1A1A1A;display:flex;align-items:center;gap:8px}
+.ob-divider{height:1px;background:#E8E5E0;margin:1.25rem 0}
+.ob-label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8B6F47;font-weight:600;margin-bottom:5px;text-align:left}
+.ob-input{width:100%;background:#fff;border:1.5px solid #E8E5E0;border-radius:10px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:14px;color:#1A1A1A;outline:none;margin-bottom:1rem}
+.ob-input:focus{border-color:#C4A882}
+#ob-btn{width:100%;background:#2C1810;color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:4px}
+#ob-btn:hover{background:#5C4033}
+.ob-note{font-size:11px;color:#9A9590;margin-top:10px}
+
+/* HEADER */
+.header{background:#2C1810;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-box{width:36px;height:36px;background:#C4A882;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.logo-box svg{width:18px;height:18px;fill:#2C1810}
+.logo-name{font-family:'Playfair Display',serif;color:#fff;font-size:18px}
+.logo-tagline{color:#C4A882;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.header-right{display:flex;gap:8px;align-items:center}
+.h-tag{background:rgba(196,168,130,.15);border:1px solid rgba(196,168,130,.3);color:#C4A882;font-size:11px;padding:5px 12px;border-radius:20px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.h-edit{background:transparent;border:1px solid rgba(196,168,130,.3);color:#C4A882;font-size:11px;padding:5px 10px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* SEARCH */
+.search-bar{background:#5C4033;padding:1.25rem 2rem;display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.s-group{display:flex;flex-direction:column;gap:5px}
+.s-group.grow{flex:2;min-width:160px}
+.s-group.fixed{min-width:130px}
+.s-label{color:#C4A882;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.s-input{background:rgba(255,255,255,.1);border:1px solid rgba(196,168,130,.35);border-radius:8px;padding:9px 13px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;width:100%}
+.s-input::placeholder{color:rgba(255,255,255,.35)}
+.s-select{background:rgba(255,255,255,.1);border:1px solid rgba(196,168,130,.35);border-radius:8px;padding:9px 13px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;cursor:pointer;width:100%}
+.s-select option{background:#5C4033}
+.s-btn{background:#C4A882;color:#2C1810;border:none;border-radius:8px;padding:9px 22px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;height:40px}
+.s-btn:hover{background:#D4A853}
+.s-btn:disabled{opacity:.6;cursor:not-allowed}
+
+/* STATS BAR */
+.stats-bar{background:#fff;border-bottom:1px solid #E8E5E0;padding:.875rem 2rem;display:flex;gap:1.75rem;align-items:center;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-n{font-family:'Playfair Display',serif;font-size:22px;color:#5C4033}
+.stat-l{font-size:11px;color:#9A9590;text-transform:uppercase;letter-spacing:.05em}
+.stat-sep{width:1px;height:32px;background:#E8E5E0}
+.filters{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.f-btn{background:#F5F3EF;border:1px solid #E8E5E0;color:#1A1A1A;font-size:12px;padding:5px 13px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.f-btn.on{background:#2C1810;color:#fff;border-color:#2C1810}
+
+/* LAYOUT */
+.layout{display:flex}
+.list{flex:1;padding:1.5rem 2rem;overflow-y:auto;max-height:calc(100vh - 220px)}
+.detail{width:380px;background:#fff;border-left:1px solid #E8E5E0;padding:1.5rem;overflow-y:auto;max-height:calc(100vh - 220px);flex-shrink:0}
+
+/* CARDS */
+.card{background:#fff;border:1px solid #E8E5E0;border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:10px;transition:all .2s}
+.card:hover{border-color:#C4A882;box-shadow:0 4px 14px rgba(92,64,51,.08);transform:translateY(-1px)}
+.card.sel{border-color:#2C1810;border-width:1.5px;background:#F5F3EF}
+.card.touched{border-left:3px solid #D4A853}
+.rank{width:28px;height:28px;background:#F5F3EF;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#9A9590;flex-shrink:0}
+.rank.top{background:#2C1810;color:#fff}
+.ava{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:16px;color:#fff;flex-shrink:0}
+.ci{flex:1;min-width:0}
+.cn{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cb{font-size:12px;color:#9A9590;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ce{font-size:11px;color:#8B6F47;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+.tags{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.tag{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:500}
+.t1{background:#F0EBE3;color:#5C4033}
+.t2{background:#EBF0E3;color:#3B6D11}
+.t3{background:#E3EBF0;color:#185FA5}
+.cs{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+.cv{font-family:'Playfair Display',serif;font-size:15px;color:#5C4033;font-weight:500}
+.cd{font-size:11px;color:#9A9590}
+.ca{display:flex;gap:5px;flex-shrink:0}
+.abtn{width:32px;height:32px;border-radius:8px;border:1px solid #E8E5E0;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9A9590}
+.abtn.dark{background:#2C1810;border-color:#2C1810;color:#fff}
+.abtn.esp{background:#1A1A1A;border-color:#1A1A1A;color:#fff}
+
+/* DETAIL PANEL */
+.dp-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;text-align:center;color:#9A9590}
+.dp-empty-title{font-family:'Playfair Display',serif;font-size:15px;color:#1A1A1A;margin-top:1rem;margin-bottom:5px}
+.dh{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid #E8E5E0}
+.d-ava{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:20px;color:#fff;flex-shrink:0}
+.d-name{font-family:'Playfair Display',serif;font-size:17px;color:#2C1810}
+.d-brok{font-size:12px;color:#9A9590;margin-top:2px}
+.d-src{font-size:11px;background:#F5F3EF;color:#8B6F47;padding:3px 8px;border-radius:4px;margin-top:4px;display:inline-block}
+.d-link{font-size:11px;color:#8B6F47;text-decoration:none;margin-top:3px;display:inline-block}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.25rem}
+.mc{background:#F5F3EF;border-radius:8px;padding:10px 12px}
+.mv{font-family:'Playfair Display',serif;font-size:14px;color:#5C4033;font-weight:500;word-break:break-all}
+.ml{font-size:11px;color:#9A9590;margin-top:2px;text-transform:uppercase;letter-spacing:.05em}
+.ds{margin-bottom:1.25rem}
+.ds-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#9A9590;margin-bottom:8px;font-weight:600}
+.crow{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#F5F3EF;border-radius:8px;margin-bottom:6px;font-size:13px}
+.stabs{display:flex;border:1px solid #E8E5E0;border-radius:8px;overflow:hidden;margin-bottom:10px}
+.stab{flex:1;padding:7px 6px;font-size:11px;background:#fff;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;color:#9A9590;text-align:center}
+.stab.on{background:#2C1810;color:#fff;font-weight:500}
+.sbox{background:#F5F3EF;border-radius:8px;padding:12px;font-size:12px;line-height:1.7;color:#1A1A1A;border:1px solid #E8E5E0;min-height:100px;white-space:pre-wrap}
+.cbtn{width:100%;margin-top:8px;background:#2C1810;color:#fff;border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.status-row{display:flex;gap:6px;flex-wrap:wrap}
+.sc{font-size:11px;padding:5px 12px;border-radius:20px;cursor:pointer;border:1px solid;font-family:'DM Sans',sans-serif}
+.sc.nc{background:#fff;border-color:#E8E5E0;color:#9A9590}
+.sc.nc.on{background:#E8E5E0;border-color:#9A9590;color:#1A1A1A;font-weight:500}
+.sc.ip{background:#fff;border-color:#E8C97A;color:#7A6020}
+.sc.ip.on{background:#FDF7E5;border-color:#D4A853;color:#7A6020;font-weight:500}
+.sc.pt{background:#fff;border-color:#C4A882;color:#5C4033}
+.sc.pt.on{background:#F5EDE0;border-color:#5C4033;color:#5C4033;font-weight:500}
+.note-box{width:100%;background:#F5F3EF;border:1px solid #E8E5E0;border-radius:8px;padding:10px 12px;font-size:12px;font-family:'DM Sans',sans-serif;color:#1A1A1A;resize:vertical;min-height:70px;outline:none}
+.note-save{background:#C4A882;color:#2C1810;border:none;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;margin-top:6px;font-family:'DM Sans',sans-serif}
+
+/* MISC */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#2C1810;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transform:translateY(8px);transition:all .3s;z-index:9999;pointer-events:none;border-left:3px solid #C4A882}
+.toast.show{opacity:1;transform:translateY(0)}
+.spinner{width:36px;height:36px;border:3px solid #E8E5E0;border-top-color:#5C4033;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading{text-align:center;padding:4rem 2rem;color:#9A9590}
+.err{text-align:center;padding:2.5rem;background:#FFF5F5;border-radius:12px;border:1px solid #FFD0D0;margin:1rem}
+.pag{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:1.5rem;padding-top:1rem;border-top:1px solid #E8E5E0}
+.pbtn{background:#fff;border:1px solid #E8E5E0;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.pbtn:disabled{opacity:.35;cursor:default}
+.pinfo{font-size:12px;color:#9A9590}
+.badge{font-size:10px;background:#D4A853;color:#2C1810;padding:2px 7px;border-radius:4px;font-weight:600;margin-left:5px}
+.sec-title{font-family:'Playfair Display',serif;font-size:16px;color:#2C1810;margin-bottom:1rem}
+@media(max-width:900px){.detail{display:none}.list{padding:1rem}}
 </style>
 </head>
 <body>
 
-<div class="onboarding-overlay" id="onboarding">
-  <div class="onboarding-card">
+<!-- ONBOARDING OVERLAY -->
+<div id="ob-overlay">
+  <div id="ob-card">
     <div class="ob-logo">
-      <div class="ob-logo-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></div>
-      <div class="ob-logo-text">RealtorHunter</div>
+      <div class="ob-logo-box">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22" fill="none" stroke="#C4A882" stroke-width="1.5"/></svg>
+      </div>
+      <div class="ob-logo-name">RealtorHunter</div>
     </div>
     <div class="ob-title">Welcome — Set up your profile</div>
     <div class="ob-sub">Your info personalizes every outreach script so messages sound like they came directly from you.</div>
     <div class="ob-features">
-      <div class="ob-feature"><span>🏠</span> Real top-producing realtors from Realtor.com</div>
-      <div class="ob-feature"><span>📞</span> Auto-personalized call, text, voicemail & email scripts</div>
-      <div class="ob-feature"><span>📊</span> Track outreach and build your referral partner list</div>
+      <div class="ob-feat"><span>🏠</span> Real top-producing realtors from Realtor.com</div>
+      <div class="ob-feat"><span>📞</span> Auto-personalized call, text, voicemail &amp; email scripts</div>
+      <div class="ob-feat"><span>📊</span> Track outreach and build your referral partner list</div>
     </div>
     <div class="ob-divider"></div>
-    <div class="ob-field"><label class="ob-label">Your First Name</label><input class="ob-input" id="ob-fname" placeholder="e.g. Sarah" maxlength="40"></div>
-    <div class="ob-field"><label class="ob-label">Your Company / Mortgage Team</label><input class="ob-input" id="ob-company" placeholder="e.g. ABC Home Mortgage" maxlength="60"></div>
-    <div class="ob-field"><label class="ob-label">Your Title (optional)</label><input class="ob-input" id="ob-title" placeholder="e.g. Loan Officer" maxlength="40"></div>
-    <button class="ob-btn" id="ob-submit-btn">Get Started →</button>
-    <div class="ob-note">Your info is saved in your browser only and never shared.</div>
+    <label class="ob-label">Your First Name</label>
+    <input class="ob-input" id="ob-fname" placeholder="e.g. Ava" maxlength="40">
+    <label class="ob-label">Your Company / Mortgage Team</label>
+    <input class="ob-input" id="ob-company" placeholder="e.g. Novus Home Mortgage" maxlength="60">
+    <label class="ob-label">Your Title (optional)</label>
+    <input class="ob-input" id="ob-title" placeholder="e.g. Loan Officer" maxlength="40">
+    <button id="ob-btn">Get Started →</button>
+    <div class="ob-note">Saved in your browser only. Never shared.</div>
   </div>
 </div>
 
-<div class="header">
-  <div class="logo">
-    <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></div>
-    <div><div class="logo-text">RealtorHunter</div><div class="logo-sub">Realtor Intelligence Platform</div></div>
-  </div>
-  <div class="header-meta">
-    <div class="header-tag" id="header-company">—</div>
-    <div class="header-tag" id="header-user">—</div>
-    <button class="header-edit-btn" onclick="editProfile()">Edit Profile</button>
-  </div>
-</div>
+<!-- MAIN APP -->
+<div id="app" style="display:none">
 
-<div class="search-section">
-  <div class="search-wrap">
-    <div class="search-group" style="flex:2"><label class="search-label">ZIP Code or City</label><input class="search-input" id="area-input" placeholder="e.g. 32765 or Orlando, FL" onkeydown="if(event.key==='Enter')runSearch()"></div>
-    <div class="search-group"><label class="search-label">Results</label>
-      <select class="search-select" id="results-select">
+  <div class="header">
+    <div class="logo">
+      <div class="logo-box">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22" fill="none" stroke="#2C1810" stroke-width="1.5"/></svg>
+      </div>
+      <div>
+        <div class="logo-name">RealtorHunter</div>
+        <div class="logo-tagline">Realtor Intelligence Platform</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="h-tag" id="h-company">—</div>
+      <div class="h-tag" id="h-user">—</div>
+      <button class="h-edit" id="h-edit-btn">Edit Profile</button>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <div class="s-group grow">
+      <span class="s-label">ZIP Code or City</span>
+      <input class="s-input" id="area-input" placeholder="e.g. 32765 or Orlando, FL">
+    </div>
+    <div class="s-group fixed">
+      <span class="s-label">Results</span>
+      <select class="s-select" id="results-sel">
         <option value="20">Top 20</option>
         <option value="30" selected>Top 30</option>
         <option value="50">Top 50</option>
       </select>
     </div>
-    <div class="search-group"><label class="search-label">Sort By</label>
-      <select class="search-select" id="sort-select">
-        <option value="sold">Most Sold</option>
+    <div class="s-group fixed">
+      <span class="s-label">Sort By</span>
+      <select class="s-select" id="sort-sel">
         <option value="volume">Highest Volume</option>
+        <option value="sold">Most Sold</option>
         <option value="listings">Most Listings</option>
         <option value="name">Name A-Z</option>
       </select>
     </div>
-    <button class="search-btn" id="search-btn" onclick="runSearch()">Search Market ↗</button>
+    <button class="s-btn" id="search-btn">Search Market ↗</button>
   </div>
-</div>
 
-<div class="stats-bar">
-  <div class="stat-item"><div class="stat-num" id="stat-total">—</div><div class="stat-label">Realtors Found</div></div>
-  <div class="stat-divider"></div>
-  <div class="stat-item"><div class="stat-num" id="stat-contacted">0</div><div class="stat-label">Contacted</div></div>
-  <div class="stat-divider"></div>
-  <div class="stat-item"><div class="stat-num" id="stat-partners">0</div><div class="stat-label">Partners</div></div>
-  <div class="stat-divider"></div>
-  <div class="stat-item"><div class="stat-num" id="stat-avgvol">—</div><div class="stat-label">Avg Annual Volume</div></div>
-  <div class="stat-divider"></div>
-  <div class="stat-item"><div class="stat-num" id="stat-topsold">—</div><div class="stat-label">Top Sold Count</div></div>
-  <div class="filter-row" id="filter-row"></div>
-</div>
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-n" id="s-total">—</div><div class="stat-l">Found</div></div>
+    <div class="stat-sep"></div>
+    <div class="stat"><div class="stat-n" id="s-contacted">0</div><div class="stat-l">Contacted</div></div>
+    <div class="stat-sep"></div>
+    <div class="stat"><div class="stat-n" id="s-partners">0</div><div class="stat-l">Partners</div></div>
+    <div class="stat-sep"></div>
+    <div class="stat"><div class="stat-n" id="s-avgvol">—</div><div class="stat-l">Avg Annual Volume</div></div>
+    <div class="stat-sep"></div>
+    <div class="stat"><div class="stat-n" id="s-topsold">—</div><div class="stat-l">Top Sold</div></div>
+    <div class="filters" id="filters"></div>
+  </div>
 
-<div class="main-layout">
-  <div class="list-panel" id="list-panel">
-    <div style="text-align:center;padding:4rem 2rem;color:var(--warm-gray)">
-      <div style="font-size:48px;margin-bottom:1rem">🏠</div>
-      <div style="font-family:var(--font-display);font-size:20px;color:var(--charcoal);margin-bottom:8px">Search Your Market</div>
-      <div style="font-size:13px;line-height:1.7">Enter a ZIP code or city above to pull<br>real top-producing realtors in that area.</div>
+  <div class="layout">
+    <div class="list" id="list-panel">
+      <div style="text-align:center;padding:4rem 2rem;color:#9A9590">
+        <div style="font-size:48px;margin-bottom:1rem">🏠</div>
+        <div style="font-family:'Playfair Display',serif;font-size:20px;color:#1A1A1A;margin-bottom:8px">Search Your Market</div>
+        <div style="font-size:13px;line-height:1.7">Enter a ZIP code or city above to pull<br>real top-producing realtors in that area.</div>
+      </div>
+    </div>
+    <div class="detail" id="detail-panel">
+      <div class="dp-empty">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8B6F47" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <div class="dp-empty-title">Select a Realtor</div>
+        <div style="font-size:12px;line-height:1.5">Click any card to view their<br>profile and outreach scripts</div>
+      </div>
     </div>
   </div>
-  <div class="detail-panel" id="detail-panel">
-    <div class="panel-empty">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--mid-brown)" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-      <div class="panel-empty-title">Select a Realtor</div>
-      <div class="panel-empty-sub">Click any realtor card to view<br>their profile and outreach scripts</div>
-    </div>
-  </div>
+
 </div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-const APIFY_TOKEN='apify_api_XCQGzWHBsZHgKeGMbNdgRSZehZrIHO459Ok5';
-const ACTOR_ID='api-empire~realtor-com-agents-by-zip-code-scraper';
-const AVATAR_COLORS=['#5C4033','#8B6F47','#3B5068','#2E5E4A','#614B32','#3D4F68','#5E3A2E','#4A6040'];
-const CACHE_KEY_PREFIX='rh_cache_';
-const CACHE_TTL_HOURS=24;
-let userProfile={fname:'',company:'',title:'Loan Officer'};
-let allRealtors=[],filteredRealtors=[],selectedId=null,currentPage=1;
-const PER_PAGE=10;
-let contactedStatus={},realtorNotes={},activeFilter='all',currentScriptType={};
+// ─── CONFIG ───────────────────────────────────────────────
+const TOKEN = 'apify_api_XCQGzWHBsZHgKeGMbNdgRSZehZrIHO459Ok5';
+const ACTOR = 'api-empire~realtor-com-agents-by-zip-code-scraper';
+const COLORS = ['#5C4033','#8B6F47','#3B5068','#2E5E4A','#614B32','#3D4F68','#5E3A2E','#4A6040'];
+const PER_PAGE = 10;
+const CACHE_PREFIX = 'rh2_';
+const CACHE_HOURS = 24;
 
-function loadProfile(){
+// ─── STATE ────────────────────────────────────────────────
+let profile = {fname:'', company:'', title:'Loan Officer'};
+let realtors = [], filtered = [], selectedId = null, page = 1;
+let statuses = {}, notes = {}, activeFilter = 'all', scriptType = {};
+
+// ─── HELPERS ──────────────────────────────────────────────
+function ini(name){
+  const p = name.trim().split(' ');
+  return p.length >= 2 ? (p[0][0] + p[p.length-1][0]).toUpperCase() : name.substring(0,2).toUpperCase();
+}
+function color(name){
+  let h = 0;
+  for(let i=0;i<name.length;i++) h = name.charCodeAt(i) + ((h<<5)-h);
+  return COLORS[Math.abs(h) % COLORS.length];
+}
+function fmt(n){
+  if(!n) return '$0';
+  if(n >= 1000000) return '$' + (n/1000000).toFixed(1) + 'M';
+  if(n >= 1000) return '$' + (n/1000).toFixed(0) + 'K';
+  return '$' + n;
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+function getCache(key){
   try{
-    const s=localStorage.getItem('rh_profile');
-    if(s){
-      userProfile=JSON.parse(s);
-      document.getElementById('header-user').textContent=userProfile.fname+' — '+userProfile.title;
-      document.getElementById('header-company').textContent=userProfile.company;
-      document.getElementById('onboarding').style.display='none';
+    const raw = localStorage.getItem(CACHE_PREFIX + key);
+    if(!raw) return null;
+    const obj = JSON.parse(raw);
+    if((Date.now() - obj.ts) / 3600000 > CACHE_HOURS){ localStorage.removeItem(CACHE_PREFIX + key); return null; }
+    return obj.data;
+  }catch(e){ return null; }
+}
+function setCache(key, data){
+  try{ localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({data, ts: Date.now()})); }catch(e){}
+}
+
+// ─── MEDIAN HOME PRICE ────────────────────────────────────
+const STATE_MED = {FL:410000,CA:750000,TX:310000,NY:550000,WA:550000,CO:530000,AZ:420000,GA:330000,NC:320000,VA:400000,NJ:500000,MA:580000,IL:290000,OH:230000,PA:260000,MI:240000,TN:320000,SC:300000,MN:330000,WI:280000,MO:240000,IN:230000,AL:220000,KY:220000,LA:210000,AR:195000,MS:180000,OK:205000,KS:215000,NE:235000,IA:210000,ND:235000,SD:235000,MT:380000,WY:320000,ID:400000,UT:490000,NV:420000,NM:280000,ME:350000,NH:430000,VT:350000,CT:370000,RI:400000,DE:360000,MD:400000,HI:780000,AK:340000,DC:620000};
+async function getMedian(area){
+  try{
+    const zip = area.replace(/\D/g,'').substring(0,5);
+    if(zip.length === 5){
+      const r = await fetch('https://api.zippopotam.us/us/' + zip);
+      if(r.ok){
+        const d = await r.json();
+        const st = d.places?.[0]?.['state abbreviation'];
+        if(st && STATE_MED[st]) return STATE_MED[st];
+      }
     }
   }catch(e){}
-}
-function completeOnboarding(){
-  const fname=document.getElementById('ob-fname').value.trim();
-  const company=document.getElementById('ob-company').value.trim();
-  const title=document.getElementById('ob-title').value.trim()||'Loan Officer';
-  if(!fname||!company){showToast('Please enter your name and company');return;}
-  userProfile={fname,company,title};
-  try{localStorage.setItem('rh_profile',JSON.stringify(userProfile));}catch(e){}
-  applyProfile();
-  document.getElementById('onboarding').classList.add('hidden');
-  showToast('Welcome, '+fname+'! Search your market to get started.');
-}
-function applyProfile(){
-  document.getElementById('header-user').textContent=userProfile.fname+' — '+userProfile.title;
-  document.getElementById('header-company').textContent=userProfile.company;
-}
-function editProfile(){
-  document.getElementById('ob-fname').value=userProfile.fname;
-  document.getElementById('ob-company').value=userProfile.company;
-  document.getElementById('ob-title').value=userProfile.title;
-  document.getElementById('onboarding').classList.remove('hidden');
-}
-function initials(name){
-  const p=name.trim().split(' ');
-  return p.length>=2?(p[0][0]+p[p.length-1][0]).toUpperCase():name.substring(0,2).toUpperCase();
-}
-function getColor(name){
-  let h=0;for(let i=0;i<name.length;i++)h=name.charCodeAt(i)+((h<<5)-h);
-  return AVATAR_COLORS[Math.abs(h)%AVATAR_COLORS.length];
-}
-function getCached(area){
-  try{
-    const key=CACHE_KEY_PREFIX+area.toLowerCase().replace(/\s+/g,'_');
-    const raw=localStorage.getItem(key);
-    if(!raw)return null;
-    const {data,timestamp}=JSON.parse(raw);
-    const ageHours=(Date.now()-timestamp)/3600000;
-    if(ageHours>CACHE_TTL_HOURS){localStorage.removeItem(key);return null;}
-    return data;
-  }catch(e){return null;}
-}
-function setCache(area,data){
-  try{
-    const key=CACHE_KEY_PREFIX+area.toLowerCase().replace(/\s+/g,'_');
-    localStorage.setItem(key,JSON.stringify({data,timestamp:Date.now()}));
-  }catch(e){}
+  return 350000;
 }
 
-async function getMedianHomePrice(zip){
-  // State-level median fallbacks (real 2024 data)
-  const STATE_MEDIANS={FL:410000,CA:750000,TX:310000,NY:550000,WA:550000,CO:530000,AZ:420000,GA:330000,NC:320000,VA:400000,NJ:500000,MA:580000,IL:290000,OH:230000,PA:260000,MI:240000,TN:320000,SC:300000,MN:330000,WI:280000,MO:240000,IN:230000,AL:220000,KY:220000,LA:210000,AR:195000,MS:180000,OK:205000,KS:215000,NE:235000,IA:210000,ND:235000,SD:235000,MT:380000,WY:320000,ID:400000,UT:490000,NV:420000,NM:280000,ME:350000,NH:430000,VT:350000,CT:370000,RI:400000,DE:360000,MD:400000,HI:780000,AK:340000,DC:620000};
-  try{
-    // Use free zip-code API to get state, then apply median
-    const res=await fetch(`https://api.zippopotam.us/us/${zip.replace(/\D/g,'').substring(0,5)}`);
-    if(res.ok){
-      const d=await res.json();
-      const state=d.places?.[0]?.['state abbreviation'];
-      if(state&&STATE_MEDIANS[state]) return STATE_MEDIANS[state];
-    }
-  }catch(e){}
-  return 350000; // national fallback
+// ─── ONBOARDING ───────────────────────────────────────────
+function showApp(){
+  document.getElementById('ob-overlay').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('h-user').textContent = profile.fname + ' — ' + profile.title;
+  document.getElementById('h-company').textContent = profile.company;
 }
 
-function fmtVolume(n){
-  if(n>=1000000) return '$'+(n/1000000).toFixed(1)+'M';
-  if(n>=1000) return '$'+(n/1000).toFixed(0)+'K';
-  return '$'+n;
-}
-
-async function runSearch(){
-  const area=document.getElementById('area-input').value.trim();
-  if(!area){showToast('Please enter a ZIP code or city');return;}
-  const btn=document.getElementById('search-btn');
-  btn.disabled=true;btn.textContent='Searching...';
-
-  // Check cache first — instant load if we have it
-  const cached=getCached(area);
-  if(cached){
-    allRealtors=cached;
-    const sort=document.getElementById('sort-select').value;
-    if(sort==='sold'||sort==='volume')allRealtors.sort((a,b)=>b.annualVolume-a.annualVolume);
-    else if(sort==='listings')allRealtors.sort((a,b)=>b.listingCount-a.listingCount);
-    else allRealtors.sort((a,b)=>a.name.localeCompare(b.name));
-    const limit=parseInt(document.getElementById('results-select').value)||30;
-    allRealtors=allRealtors.slice(0,limit);
-    allRealtors.forEach((r,i)=>r.rank=i+1);
-    activeFilter='all';currentPage=1;selectedId=null;
-    updateStats();buildFilterBtns();applyFilter();renderDetail(null);
-    btn.disabled=false;btn.textContent='Search Market ↗';
-    showToast('⚡ Loaded from cache — instant results!');
-    return;
-  }
-
-  document.getElementById('list-panel').innerHTML=`<div class="loading-state"><div class="loading-spinner"></div><div style="font-family:var(--font-display);font-size:18px;color:var(--charcoal);margin-bottom:8px">Pulling Real Realtors...</div><div style="font-size:13px">Fetching live data from Realtor.com for ${area}</div></div>`;
-  try{
-    // Get median home price for this ZIP in parallel with Apify run
-    const medianPricePromise=getMedianHomePrice(area);
-
-    const runRes=await fetch(`https://api.apify.com/v2/acts/${ACTOR_ID}/runs?token=${APIFY_TOKEN}`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({zipCodes:[area],maxResults:50})
-    });
-    if(!runRes.ok)throw new Error('Failed to start search');
-    const runData=await runRes.json();
-    const runId=runData.data.id;
-    let attempts=0,results=null;
-    while(attempts<30){
-      await new Promise(r=>setTimeout(r,3000));attempts++;
-      document.getElementById('list-panel').innerHTML=`<div class="loading-state"><div class="loading-spinner"></div><div style="font-family:var(--font-display);font-size:18px;color:var(--charcoal);margin-bottom:8px">Pulling Real Realtors...</div><div style="font-size:13px">Fetching live data... (${attempts*3}s)</div></div>`;
-      const statusRes=await fetch(`https://api.apify.com/v2/actor-runs/${runId}?token=${APIFY_TOKEN}`);
-      const statusData=await statusRes.json();
-      const status=statusData.data.status;
-      if(status==='SUCCEEDED'){
-        const dataRes=await fetch(`https://api.apify.com/v2/datasets/${statusData.data.defaultDatasetId}/items?token=${APIFY_TOKEN}&clean=true`);
-        results=await dataRes.json();break;
-      }else if(status==='FAILED'||status==='ABORTED'){throw new Error('Search failed');}
-    }
-    if(!results||results.length===0)throw new Error('No results found for this area');
-
-    const medianPrice=await medianPricePromise;
-    allRealtors=results.map((r,i)=>{
-      const name=(r.agent_name||r.name||'Unknown Agent').replace(/,\s*(agent|broker|realtor|associate|pa|llc).*/gi,'').trim();
-      const soldCount=parseInt(r.sold_count)||0;
-      return{
-        id:i+1,name,brokerage:r.broker_name||r.brokerage||r.office_name||'Independent',
-        phone:r.office_phone||r.phone||'Not listed',
-        mobilePhone:Array.isArray(r.mobile_phones)?r.mobile_phones[0]:'',
-        email:r.email||'',soldCount,annualVolume:soldCount*medianPrice,medianPrice,
-        listingCount:parseInt(r.listing_count)||0,
-        profileUrl:r.website||'',
-        areasServed:Array.isArray(r.areas_serviced)?r.areas_serviced:[],
-        color:getColor(name),rank:i+1
-      };
-    });
-    const sort=document.getElementById('sort-select').value;
-    if(sort==='sold'||sort==='volume')allRealtors.sort((a,b)=>b.annualVolume-a.annualVolume);
-    else if(sort==='listings')allRealtors.sort((a,b)=>b.listingCount-a.listingCount);
-    else allRealtors.sort((a,b)=>a.name.localeCompare(b.name));
-    const limit=parseInt(document.getElementById('results-select').value)||30;
-    allRealtors=allRealtors.slice(0,limit);
-    else if(sort==='listings')allRealtors.sort((a,b)=>b.listingCount-a.listingCount);
-    else allRealtors.sort((a,b)=>a.name.localeCompare(b.name));
-    allRealtors.forEach((r,i)=>r.rank=i+1);
-    setCache(area,allRealtors);
-    activeFilter='all';currentPage=1;selectedId=null;
-    updateStats();buildFilterBtns();applyFilter();renderDetail(null);
-  }catch(err){
-    document.getElementById('list-panel').innerHTML=`<div class="error-state"><div style="font-size:32px;margin-bottom:1rem">⚠️</div><div style="font-family:var(--font-display);font-size:16px;color:#C0392B;margin-bottom:8px">Search Failed</div><div style="font-size:13px;color:#666;line-height:1.6">Could not fetch realtors for "${area}".<br>Please check the ZIP code and try again.</div><div style="font-size:11px;color:#999;margin-top:8px">${err.message}</div></div>`;
-  }
-  btn.disabled=false;btn.textContent='Search Market ↗';
-}
-
-function updateStats(){
-  document.getElementById('stat-total').textContent=allRealtors.length;
-  document.getElementById('stat-contacted').textContent=Object.values(contactedStatus).filter(v=>v&&v!=='not-contacted').length;
-  document.getElementById('stat-partners').textContent=Object.values(contactedStatus).filter(v=>v==='partner').length;
-  document.getElementById('stat-topsold').textContent=allRealtors.length?Math.max(...allRealtors.map(r=>r.soldCount)):'—';
-  if(allRealtors.length){
-    const avgVol=allRealtors.reduce((s,r)=>s+r.annualVolume,0)/allRealtors.length;
-    document.getElementById('stat-avgvol').textContent=fmtVolume(Math.round(avgVol));
-  } else {
-    document.getElementById('stat-avgvol').textContent='—';
-  }
-}
-function buildFilterBtns(){
-  const row=document.getElementById('filter-row');row.innerHTML='';
-  [{k:'all',l:'All'},{k:'not-contacted',l:'Not Contacted'},{k:'in-progress',l:'In Progress'},{k:'partner',l:'Partners'}].forEach(f=>{
-    const btn=document.createElement('button');
-    btn.className='filter-btn'+(activeFilter===f.k?' active':'');
-    btn.textContent=f.l;
-    btn.onclick=()=>{activeFilter=f.k;currentPage=1;buildFilterBtns();applyFilter()};
-    row.appendChild(btn);
-  });
-}
-function applyFilter(){
-  filteredRealtors=activeFilter==='all'?[...allRealtors]:allRealtors.filter(r=>(contactedStatus[r.id]||'not-contacted')===activeFilter);
-  renderList();
-}
-function renderList(){
-  const panel=document.getElementById('list-panel');
-  if(!filteredRealtors.length){panel.innerHTML='<div style="text-align:center;padding:3rem;color:var(--warm-gray)"><div style="font-size:16px;font-family:var(--font-display);color:var(--charcoal)">No results in this filter</div></div>';return;}
-  const totalPages=Math.ceil(filteredRealtors.length/PER_PAGE);
-  const page=filteredRealtors.slice((currentPage-1)*PER_PAGE,currentPage*PER_PAGE);
-  const area=document.getElementById('area-input').value;
-  let html=`<div class="section-title">Real Realtors — ${area} <span style="font-size:12px;color:var(--warm-gray);font-family:var(--font-body);font-weight:400">via Realtor.com</span></div><div class="realtor-grid">`;
-  page.forEach(r=>{
-    const st=contactedStatus[r.id]||'not-contacted';
-    const badge=st==='partner'?`<span class="badge-status">Partner</span>`:st==='in-progress'?`<span class="badge-status" style="background:var(--soft-gray);color:var(--charcoal)">In Progress</span>`:'';
-    html+=`<div class="realtor-card${selectedId===r.id?' selected':''}${st!=='not-contacted'?' contacted':''}" onclick="selectRealtor(${r.id})">
-      <div class="rank-badge${r.rank<=5?' top':''}">${r.rank}</div>
-      <div class="avatar" style="background:${r.color}">${initials(r.name)}</div>
-      <div class="realtor-info">
-        <div class="realtor-name">${r.name}${badge}</div>
-        <div class="realtor-brokerage">${r.brokerage}</div>
-        ${r.email?`<div style="font-size:11px;color:var(--mid-brown);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px">✉ ${r.email}</div>`:`<div style="font-size:11px;color:var(--warm-gray);margin-top:2px">✉ No email listed</div>`}
-        <div class="realtor-tags" style="margin-top:4px">
-          <span class="tag tag-sold">${r.soldCount} sold</span>
-          ${r.listingCount>0?`<span class="tag tag-listings">${r.listingCount} listings</span>`:''}
-          ${r.areasServed&&r.areasServed[0]?`<span class="tag tag-specialty">${r.areasServed[0]}</span>`:''}
-        </div>
-      </div>
-      <div class="realtor-stats">
-        <div class="stat-vol">${fmtVolume(r.annualVolume)}</div>
-        <div class="stat-deals">${r.soldCount} sold · ${r.listingCount} active</div>
-      </div>
-      <div class="card-actions">
-        <button class="action-btn primary" onclick="event.stopPropagation();copyScript(${r.id},'call')" title="Copy Call Script">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.8 19.8 0 01.09 1.24a2 2 0 012-2.18H5a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
-        </button>
-        ${r.email?`<button class="action-btn" onclick="event.stopPropagation();navigator.clipboard.writeText('${r.email}');showToast('Email copied!')" title="Copy Email" style="background:var(--espresso);border-color:var(--espresso);color:var(--white)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        </button>`:''}
-        <button class="action-btn" onclick="event.stopPropagation();selectRealtor(${r.id})" title="View Profile">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </button>
-      </div>
-    </div>`;
-  });
-  html+=`</div><div class="pag-row"><button class="pag-btn" onclick="goPage(${currentPage-1})" ${currentPage<=1?'disabled':''}>← Prev</button><span class="pag-info">Page ${currentPage} of ${totalPages} · ${filteredRealtors.length} agents</span><button class="pag-btn" onclick="goPage(${currentPage+1})" ${currentPage>=totalPages?'disabled':''}>Next →</button></div>`;
-  panel.innerHTML=html;
-}
-function goPage(p){const t=Math.ceil(filteredRealtors.length/PER_PAGE);if(p<1||p>t)return;currentPage=p;renderList();document.getElementById('list-panel').scrollTop=0;}
-function selectRealtor(id){selectedId=id;renderList();renderDetail(allRealtors.find(x=>x.id===id));}
-function getScript(r,type){
-  const u=userProfile;const area=document.getElementById('area-input').value||'your area';
-  const fname=r.name.split(' ')[0];
-  if(type==='call')return`Hi, is this ${r.name}?\n\nHi ${fname}! This is ${u.fname} with ${u.company}. I was looking at top agents in ${area} on Realtor.com and noticed you've closed ${r.soldCount} transactions — that's an estimated ${fmtVolume(r.annualVolume)} in volume. That's seriously impressive.\n\nI work with a lot of buyers and I'm always looking for top agents to refer them to. I'd love to grab 10 minutes to chat — would this week work for a quick call?`;
-  if(type==='vm')return`Hi ${fname}, this is ${u.fname} with ${u.company}. I was researching top producers in ${area} and came across your profile on Realtor.com — ${r.soldCount} closed transactions and an estimated ${fmtVolume(r.annualVolume)} in volume is outstanding.\n\nI'd love to connect about some buyers I'm working with. Please call me back at your convenience — I'll send you a text too. Have a great day!`;
-  if(type==='text')return`Hi ${fname}! This is ${u.fname} from ${u.company}. I saw your profile on Realtor.com — ${r.soldCount} closed deals (~${fmtVolume(r.annualVolume)} in volume) at ${r.brokerage} is amazing! I'd love to connect about buyers I'm working with. Open to a quick 10-min call? 🏠`;
-  if(type==='email')return`Subject: Quick Intro — ${u.fname} at ${u.company}\n\nHi ${fname},\n\nI came across your profile while researching top producers in ${area} and was really impressed — ${r.soldCount} closed transactions and an estimated ${fmtVolume(r.annualVolume)} in annual volume at ${r.brokerage} is outstanding.\n\nI'm ${u.fname}, a ${u.title} with ${u.company}. We specialize in fast pre-approvals and clear communication that makes closings smoother for everyone.\n\nI'd love to connect for a quick 15-minute call to see if there's a fit. Are you available this week?\n\nBest,\n${u.fname}\n${u.title} | ${u.company}`;
-}
-function renderDetail(r){
-  const panel=document.getElementById('detail-panel');
-  if(!r){panel.innerHTML=`<div class="panel-empty"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--mid-brown)" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><div class="panel-empty-title">Select a Realtor</div><div class="panel-empty-sub">Click any realtor card to view<br>their profile and outreach scripts</div></div>`;return;}
-  const st=contactedStatus[r.id]||'not-contacted';
-  const note=realtorNotes[r.id]||'';
-  panel.innerHTML=`
-    <div class="detail-header">
-      <div class="detail-avatar" style="background:${r.color}">${initials(r.name)}</div>
-      <div>
-        <div class="detail-name">${r.name}</div>
-        <div class="detail-brokerage">${r.brokerage}</div>
-        <div class="detail-source">Realtor.com · Rank #${r.rank}</div>
-        ${r.profileUrl?`<a href="${r.profileUrl}" target="_blank" class="realtor-link">View on Realtor.com ↗</a>`:''}
-      </div>
-    </div>
-    <div class="metrics-grid">
-      <div class="metric-card"><div class="metric-val">${fmtVolume(r.annualVolume)}</div><div class="metric-lbl">Est. Annual Volume</div></div>
-      <div class="metric-card"><div class="metric-val">${r.soldCount}</div><div class="metric-lbl">Total Sold</div></div>
-      <div class="metric-card"><div class="metric-val">${r.listingCount}</div><div class="metric-lbl">Active Listings</div></div>
-      <div class="metric-card"><div class="metric-val" style="font-size:11px">${fmtVolume(r.medianPrice||350000)}</div><div class="metric-lbl">Area Median Price</div></div>
-    </div>
-    ${r.areasServed&&r.areasServed.length?`<div class="detail-section"><div class="detail-section-title">Areas Served</div><div style="display:flex;gap:6px;flex-wrap:wrap">${r.areasServed.slice(0,4).map(a=>`<span class="tag tag-specialty">${a}</span>`).join('')}</div></div>`:''}
-    <div class="detail-section">
-      <div class="detail-section-title">Contact Info</div>
-      <div class="contact-row"><span>📞</span><span>${r.phone}</span></div>
-      ${r.mobilePhone?`<div class="contact-row"><span>📱</span><span>${r.mobilePhone}</span></div>`:''}
-      ${r.email?`<div class="contact-row"><span>✉</span><span style="font-size:12px">${r.email}</span></div>`:''}
-    </div>
-    <div class="detail-section">
-      <div class="detail-section-title">Outreach Scripts</div>
-      <div class="script-tabs">
-        <button class="script-tab active" onclick="switchScript(${r.id},'call',this)">Call</button>
-        <button class="script-tab" onclick="switchScript(${r.id},'vm',this)">Voicemail</button>
-        <button class="script-tab" onclick="switchScript(${r.id},'text',this)">Text</button>
-        <button class="script-tab" onclick="switchScript(${r.id},'email',this)">Email</button>
-      </div>
-      <div class="script-box" id="script-content-${r.id}">${getScript(r,'call')}</div>
-      <button class="copy-btn" onclick="copyScript(${r.id},'current')">Copy Script</button>
-    </div>
-    <div class="detail-section">
-      <div class="detail-section-title">Relationship Status</div>
-      <div class="status-row">
-        <button class="status-chip not-contacted${st==='not-contacted'?' sel':''}" onclick="setStatus(${r.id},'not-contacted')">Not Contacted</button>
-        <button class="status-chip in-progress${st==='in-progress'?' sel':''}" onclick="setStatus(${r.id},'in-progress')">In Progress</button>
-        <button class="status-chip partner${st==='partner'?' sel':''}" onclick="setStatus(${r.id},'partner')">Partner ✓</button>
-      </div>
-    </div>
-    <div class="detail-section">
-      <div class="detail-section-title">Notes</div>
-      <textarea class="note-input" id="note-${r.id}" placeholder="Add notes about this realtor...">${note}</textarea>
-      <button class="save-note-btn" onclick="saveNote(${r.id})">Save Note</button>
-    </div>`;
-}
-function switchScript(id,type,btn){
-  const r=allRealtors.find(x=>x.id===id);
-  document.querySelectorAll('.script-tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');currentScriptType[id]=type;
-  document.getElementById('script-content-'+id).textContent=getScript(r,type);
-}
-function copyScript(id,typeArg){
-  const r=allRealtors.find(x=>x.id===id);if(!r)return;
-  const type=typeArg==='current'?(currentScriptType[id]||'call'):typeArg;
-  navigator.clipboard.writeText(getScript(r,type)).then(()=>showToast('Script copied!')).catch(()=>showToast('Script ready!'));
-}
-function setStatus(id,st){contactedStatus[id]=st;updateStats();applyFilter();renderDetail(allRealtors.find(x=>x.id===id));showToast('Status updated!');}
-function saveNote(id){realtorNotes[id]=document.getElementById('note-'+id).value;showToast('Note saved!');}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
-buildFilterBtns();
-loadProfile();
-
-// Wire up Get Started button safely
-document.getElementById('ob-submit-btn').addEventListener('click', function(){
+document.getElementById('ob-btn').addEventListener('click', function(){
   const fname = document.getElementById('ob-fname').value.trim();
   const company = document.getElementById('ob-company').value.trim();
   const title = document.getElementById('ob-title').value.trim() || 'Loan Officer';
-  if(!fname || !company){
-    alert('Please enter your first name and company.');
-    return;
-  }
-  userProfile = {fname, company, title};
-  try{ localStorage.setItem('rh_profile', JSON.stringify(userProfile)); }catch(e){}
-  document.getElementById('header-user').textContent = fname + ' — ' + title;
-  document.getElementById('header-company').textContent = company;
-  document.getElementById('onboarding').style.display = 'none';
+  if(!fname){ alert('Please enter your first name.'); return; }
+  if(!company){ alert('Please enter your company name.'); return; }
+  profile = {fname, company, title};
+  try{ localStorage.setItem('rh_profile2', JSON.stringify(profile)); }catch(e){}
+  showApp();
 });
 
+document.getElementById('ob-fname').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('ob-btn').click(); });
+document.getElementById('ob-company').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('ob-btn').click(); });
+
+// Load saved profile
+(function(){
+  try{
+    const s = localStorage.getItem('rh_profile2');
+    if(s){
+      profile = JSON.parse(s);
+      showApp();
+    }
+  }catch(e){}
+})();
+
+// Edit profile button
+document.getElementById('h-edit-btn').addEventListener('click', function(){
+  document.getElementById('ob-fname').value = profile.fname;
+  document.getElementById('ob-company').value = profile.company;
+  document.getElementById('ob-title').value = profile.title;
+  document.getElementById('ob-overlay').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+});
+
+// ─── SEARCH ───────────────────────────────────────────────
+document.getElementById('search-btn').addEventListener('click', runSearch);
+document.getElementById('area-input').addEventListener('keydown', function(e){ if(e.key==='Enter') runSearch(); });
+
+async function runSearch(){
+  const area = document.getElementById('area-input').value.trim();
+  if(!area){ toast('Please enter a ZIP code or city'); return; }
+
+  const btn = document.getElementById('search-btn');
+  btn.disabled = true; btn.textContent = 'Searching...';
+
+  // Check cache
+  const cached = getCache(area.toLowerCase());
+  if(cached){
+    realtors = cached;
+    sortAndLimit();
+    page = 1; selectedId = null; activeFilter = 'all';
+    updateStats(); buildFilters(); applyFilter(); renderDetail(null);
+    btn.disabled = false; btn.textContent = 'Search Market ↗';
+    toast('⚡ Instant — loaded from cache!');
+    return;
+  }
+
+  setLoading(area);
+
+  try{
+    const medianPromise = getMedian(area);
+
+    const run = await fetch('https://api.apify.com/v2/acts/' + ACTOR + '/runs?token=' + TOKEN, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({zipCodes:[area], maxResults:50})
+    });
+    if(!run.ok) throw new Error('Could not start search');
+    const runData = await run.json();
+    const runId = runData.data.id;
+
+    let results = null;
+    for(let i=0; i<30; i++){
+      await wait(3000);
+      setLoading(area, (i+1)*3);
+      const sr = await fetch('https://api.apify.com/v2/actor-runs/' + runId + '?token=' + TOKEN);
+      const sd = await sr.json();
+      if(sd.data.status === 'SUCCEEDED'){
+        const dr = await fetch('https://api.apify.com/v2/datasets/' + sd.data.defaultDatasetId + '/items?token=' + TOKEN + '&clean=true');
+        results = await dr.json();
+        break;
+      }
+      if(sd.data.status === 'FAILED' || sd.data.status === 'ABORTED') throw new Error('Search failed on server');
+    }
+
+    if(!results || !results.length) throw new Error('No realtors found for "' + area + '"');
+
+    const median = await medianPromise;
+
+    realtors = results.map((r, i) => {
+      const name = (r.agent_name || r.name || 'Unknown Agent').replace(/,\s*(agent|broker|realtor|associate|pa|llc).*/gi,'').trim();
+      const sold = parseInt(r.sold_count) || 0;
+      return {
+        id: i+1, name,
+        brokerage: r.broker_name || r.brokerage || r.office_name || 'Independent',
+        phone: r.office_phone || r.phone || '',
+        mobile: Array.isArray(r.mobile_phones) ? r.mobile_phones[0] : '',
+        email: r.email || '',
+        sold, volume: sold * median, median,
+        listings: parseInt(r.listing_count) || 0,
+        url: r.website || '',
+        areas: Array.isArray(r.areas_serviced) ? r.areas_serviced : [],
+        col: color(name), rank: i+1
+      };
+    });
+
+    setCache(area.toLowerCase(), realtors);
+    sortAndLimit();
+    page = 1; selectedId = null; activeFilter = 'all';
+    updateStats(); buildFilters(); applyFilter(); renderDetail(null);
+
+  } catch(err){
+    document.getElementById('list-panel').innerHTML = '<div class="err"><div style="font-size:28px;margin-bottom:.75rem">⚠️</div><div style="font-family:\'Playfair Display\',serif;font-size:15px;color:#C0392B;margin-bottom:6px">Search Failed</div><div style="font-size:13px;color:#666;line-height:1.6">' + err.message + '</div></div>';
+  }
+
+  btn.disabled = false; btn.textContent = 'Search Market ↗';
+}
+
+function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+function setLoading(area, secs){
+  document.getElementById('list-panel').innerHTML = '<div class="loading"><div class="spinner"></div><div style="font-family:\'Playfair Display\',serif;font-size:17px;color:#1A1A1A;margin-bottom:6px">Pulling Real Realtors...</div><div style="font-size:13px">Fetching live data from Realtor.com for ' + area + (secs ? ' (' + secs + 's)' : '') + '</div></div>';
+}
+
+function sortAndLimit(){
+  const sort = document.getElementById('sort-sel').value;
+  const lim = parseInt(document.getElementById('results-sel').value) || 30;
+  if(sort === 'volume' || sort === 'sold') realtors.sort((a,b) => b.volume - a.volume);
+  else if(sort === 'listings') realtors.sort((a,b) => b.listings - a.listings);
+  else realtors.sort((a,b) => a.name.localeCompare(b.name));
+  realtors = realtors.slice(0, lim);
+  realtors.forEach((r,i) => r.rank = i+1);
+}
+
+// ─── STATS ────────────────────────────────────────────────
+function updateStats(){
+  document.getElementById('s-total').textContent = realtors.length;
+  document.getElementById('s-contacted').textContent = Object.values(statuses).filter(v => v && v !== 'nc').length;
+  document.getElementById('s-partners').textContent = Object.values(statuses).filter(v => v === 'pt').length;
+  document.getElementById('s-topsold').textContent = realtors.length ? Math.max(...realtors.map(r=>r.sold)) : '—';
+  if(realtors.length){
+    const avg = realtors.reduce((s,r) => s + r.volume, 0) / realtors.length;
+    document.getElementById('s-avgvol').textContent = fmt(Math.round(avg));
+  } else {
+    document.getElementById('s-avgvol').textContent = '—';
+  }
+}
+
+// ─── FILTERS ──────────────────────────────────────────────
+function buildFilters(){
+  const wrap = document.getElementById('filters'); wrap.innerHTML = '';
+  [{k:'all',l:'All'},{k:'nc',l:'Not Contacted'},{k:'ip',l:'In Progress'},{k:'pt',l:'Partners'}].forEach(f => {
+    const b = document.createElement('button');
+    b.className = 'f-btn' + (activeFilter===f.k?' on':'');
+    b.textContent = f.l;
+    b.onclick = () => { activeFilter = f.k; page = 1; buildFilters(); applyFilter(); };
+    wrap.appendChild(b);
+  });
+}
+
+function applyFilter(){
+  filtered = activeFilter === 'all' ? [...realtors] : realtors.filter(r => (statuses[r.id]||'nc') === activeFilter);
+  renderList();
+}
+
+// ─── LIST ─────────────────────────────────────────────────
+function renderList(){
+  const panel = document.getElementById('list-panel');
+  if(!filtered.length){
+    panel.innerHTML = '<div style="text-align:center;padding:3rem;color:#9A9590"><div style="font-family:\'Playfair Display\',serif;font-size:15px;color:#1A1A1A">No realtors in this filter</div></div>';
+    return;
+  }
+  const total = Math.ceil(filtered.length / PER_PAGE);
+  const slice = filtered.slice((page-1)*PER_PAGE, page*PER_PAGE);
+  const area = document.getElementById('area-input').value;
+  let html = '<div class="sec-title">Real Realtors — ' + area + ' <span style="font-size:12px;color:#9A9590;font-family:\'DM Sans\',sans-serif;font-weight:400">via Realtor.com</span></div>';
+
+  slice.forEach(r => {
+    const st = statuses[r.id] || 'nc';
+    const badge = st==='pt' ? '<span class="badge">Partner</span>' : st==='ip' ? '<span class="badge" style="background:#E8E5E0;color:#1A1A1A">In Progress</span>' : '';
+    html += `<div class="card${selectedId===r.id?' sel':''}${st!=='nc'?' touched':''}" onclick="selectR(${r.id})">
+      <div class="rank${r.rank<=5?' top':''}">${r.rank}</div>
+      <div class="ava" style="background:${r.col}">${ini(r.name)}</div>
+      <div class="ci">
+        <div class="cn">${r.name}${badge}</div>
+        <div class="cb">${r.brokerage}</div>
+        ${r.email ? `<div class="ce">✉ ${r.email}</div>` : '<div style="font-size:11px;color:#9A9590;margin-top:2px">✉ No email listed</div>'}
+        <div class="tags">
+          <span class="tag t1">${r.sold} sold</span>
+          ${r.listings > 0 ? `<span class="tag t2">${r.listings} listings</span>` : ''}
+          ${r.areas[0] ? `<span class="tag t3">${r.areas[0]}</span>` : ''}
+        </div>
+      </div>
+      <div class="cs">
+        <div class="cv">${fmt(r.volume)}</div>
+        <div class="cd">${r.sold} sold · ${r.listings} active</div>
+      </div>
+      <div class="ca">
+        <button class="abtn dark" onclick="event.stopPropagation();copyS(${r.id},'call')" title="Copy Call Script">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.8 19.8 0 01.09 1.24a2 2 0 012-2.18H5a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+        </button>
+        ${r.email ? `<button class="abtn esp" onclick="event.stopPropagation();navigator.clipboard.writeText('${r.email}');toast('Email copied!')" title="Copy Email">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </button>` : ''}
+        <button class="abtn" onclick="event.stopPropagation();selectR(${r.id})" title="View Profile">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+      </div>
+    </div>`;
+  });
+
+  html += `<div class="pag">
+    <button class="pbtn" onclick="goPage(${page-1})" ${page<=1?'disabled':''}>← Prev</button>
+    <span class="pinfo">Page ${page} of ${total} · ${filtered.length} agents</span>
+    <button class="pbtn" onclick="goPage(${page+1})" ${page>=total?'disabled':''}>Next →</button>
+  </div>`;
+
+  panel.innerHTML = html;
+}
+
+function goPage(p){
+  const t = Math.ceil(filtered.length/PER_PAGE);
+  if(p<1||p>t) return;
+  page = p; renderList();
+  document.getElementById('list-panel').scrollTop = 0;
+}
+
+// ─── DETAIL ───────────────────────────────────────────────
+function selectR(id){
+  selectedId = id; renderList();
+  renderDetail(realtors.find(x => x.id===id));
+}
+
+function script(r, type){
+  const u = profile;
+  const area = document.getElementById('area-input').value || 'your area';
+  const fn = r.name.split(' ')[0];
+  if(type==='call') return `Hi, is this ${r.name}?\n\nHi ${fn}! This is ${u.fname} with ${u.company}. I was looking at top agents in ${area} on Realtor.com and noticed you've closed ${r.sold} transactions — that's an estimated ${fmt(r.volume)} in volume. That's seriously impressive.\n\nI work with a lot of buyers and I'm always looking for great agents to refer them to. I'd love to grab 10 minutes to connect — would this week work for a quick call?`;
+  if(type==='vm') return `Hi ${fn}, this is ${u.fname} with ${u.company}. I was researching top producers in ${area} and came across your Realtor.com profile — ${r.sold} closed transactions and an estimated ${fmt(r.volume)} in volume is outstanding.\n\nI'd love to connect about buyers I'm working with. Please call me back at your convenience — I'll send a text too. Have a great day!`;
+  if(type==='text') return `Hi ${fn}! This is ${u.fname} from ${u.company}. Saw your profile on Realtor.com — ${r.sold} closed deals (~${fmt(r.volume)} in volume) at ${r.brokerage} is amazing! I'd love to connect about buyers I'm working with. Open to a quick 10-min call? 🏠`;
+  if(type==='email') return `Subject: Quick Intro — ${u.fname} at ${u.company}\n\nHi ${fn},\n\nI came across your profile while researching top producers in ${area} — ${r.sold} closed transactions and an estimated ${fmt(r.volume)} in annual volume at ${r.brokerage} is outstanding.\n\nI'm ${u.fname}, a ${u.title} with ${u.company}. We specialize in fast pre-approvals and clear communication that makes closings smoother for everyone.\n\nI'd love to connect for a quick 15-minute call to see if there's a fit. Are you available this week?\n\nBest,\n${u.fname}\n${u.title} | ${u.company}`;
+}
+
+function renderDetail(r){
+  const panel = document.getElementById('detail-panel');
+  if(!r){
+    panel.innerHTML = '<div class="dp-empty"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8B6F47" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><div class="dp-empty-title">Select a Realtor</div><div style="font-size:12px;line-height:1.5">Click any card to view their<br>profile and outreach scripts</div></div>';
+    return;
+  }
+  const st = statuses[r.id] || 'nc';
+  const note = notes[r.id] || '';
+  scriptType[r.id] = scriptType[r.id] || 'call';
+
+  panel.innerHTML = `
+    <div class="dh">
+      <div class="d-ava" style="background:${r.col}">${ini(r.name)}</div>
+      <div>
+        <div class="d-name">${r.name}</div>
+        <div class="d-brok">${r.brokerage}</div>
+        <div class="d-src">Realtor.com · Rank #${r.rank}</div>
+        ${r.url ? `<a href="${r.url}" target="_blank" class="d-link">View on Realtor.com ↗</a>` : ''}
+      </div>
+    </div>
+    <div class="mgrid">
+      <div class="mc"><div class="mv">${fmt(r.volume)}</div><div class="ml">Est. Annual Volume</div></div>
+      <div class="mc"><div class="mv">${r.sold}</div><div class="ml">Total Sold</div></div>
+      <div class="mc"><div class="mv">${r.listings}</div><div class="ml">Active Listings</div></div>
+      <div class="mc"><div class="mv">${fmt(r.median)}</div><div class="ml">Area Median Price</div></div>
+    </div>
+    ${r.areas.length ? `<div class="ds"><div class="ds-title">Areas Served</div><div style="display:flex;gap:6px;flex-wrap:wrap">${r.areas.slice(0,4).map(a=>`<span class="tag t3">${a}</span>`).join('')}</div></div>` : ''}
+    <div class="ds">
+      <div class="ds-title">Contact Info</div>
+      ${r.phone ? `<div class="crow"><span>📞</span><span>${r.phone}</span></div>` : ''}
+      ${r.mobile ? `<div class="crow"><span>📱</span><span>${r.mobile}</span></div>` : ''}
+      ${r.email ? `<div class="crow"><span>✉</span><span style="font-size:12px">${r.email}</span></div>` : '<div class="crow" style="color:#9A9590">✉ No email listed</div>'}
+    </div>
+    <div class="ds">
+      <div class="ds-title">Outreach Scripts</div>
+      <div class="stabs">
+        <button class="stab${scriptType[r.id]==='call'?' on':''}" onclick="switchS(${r.id},'call',this)">Call</button>
+        <button class="stab${scriptType[r.id]==='vm'?' on':''}" onclick="switchS(${r.id},'vm',this)">Voicemail</button>
+        <button class="stab${scriptType[r.id]==='text'?' on':''}" onclick="switchS(${r.id},'text',this)">Text</button>
+        <button class="stab${scriptType[r.id]==='email'?' on':''}" onclick="switchS(${r.id},'email',this)">Email</button>
+      </div>
+      <div class="sbox" id="sbox-${r.id}">${script(r, scriptType[r.id])}</div>
+      <button class="cbtn" onclick="copyS(${r.id},'current')">Copy Script</button>
+    </div>
+    <div class="ds">
+      <div class="ds-title">Relationship Status</div>
+      <div class="status-row">
+        <button class="sc nc${st==='nc'?' on':''}" onclick="setSt(${r.id},'nc')">Not Contacted</button>
+        <button class="sc ip${st==='ip'?' on':''}" onclick="setSt(${r.id},'ip')">In Progress</button>
+        <button class="sc pt${st==='pt'?' on':''}" onclick="setSt(${r.id},'pt')">Partner ✓</button>
+      </div>
+    </div>
+    <div class="ds">
+      <div class="ds-title">Notes</div>
+      <textarea class="note-box" id="note-${r.id}" placeholder="Add notes about this realtor...">${note}</textarea>
+      <button class="note-save" onclick="saveNote(${r.id})">Save Note</button>
+    </div>`;
+}
+
+function switchS(id, type, btn){
+  const r = realtors.find(x=>x.id===id);
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  scriptType[id] = type;
+  document.getElementById('sbox-'+id).textContent = script(r, type);
+}
+
+function copyS(id, typeArg){
+  const r = realtors.find(x=>x.id===id); if(!r) return;
+  const type = typeArg==='current' ? (scriptType[id]||'call') : typeArg;
+  navigator.clipboard.writeText(script(r, type)).then(()=>toast('Script copied!')).catch(()=>toast('Script ready!'));
+}
+
+function setSt(id, st){
+  statuses[id] = st;
+  updateStats(); applyFilter();
+  renderDetail(realtors.find(x=>x.id===id));
+  toast('Status updated!');
+}
+
+function saveNote(id){
+  notes[id] = document.getElementById('note-'+id).value;
+  toast('Note saved!');
+}
+
+// Init filters
+buildFilters();
 </script>
 </body>
 </html>
