@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RealtorHunter</title>
-<script src="https://static.memberstack.com/scripts/v1/memberstack.js" data-memberstack-id="pk_3715849099a462f29b1e"></script>
+<script src="https://api.memberstack.com/static/memberstack.js?custom=pk_3715849099a462f29b1e"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -708,12 +708,9 @@ let ms = null;
 // Init Memberstack DOM
 function initMS(){
   try{
-    // Try window.$memberstackDom first (official script)
     if(window.$memberstackDom){
       ms = window.$memberstackDom;
-      checkSession();
-    } else if(window.memberstackDom){
-      ms = window.memberstackDom.init({ publicKey: MS_KEY });
+      console.log('MS ready:', ms);
       checkSession();
     } else {
       setTimeout(initMS, 300);
