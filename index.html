@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RealtorHunter</title>
-<script src="https://cdn.memberstack.com/scripts/webflow/memberstack.js" data-memberstack-app="pk_3715849099a462f29b1e" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@memberstack/dom@latest/dist/umd/memberstack-dom.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -703,6 +703,41 @@ buildFilters();
 
 // ─── MEMBERSTACK AUTH ─────────────────────────────────────
 const MS_KEY = 'pk_3715849099a462f29b1e';
+let ms = null;
+
+// Init Memberstack DOM
+function initMS(){
+  try{
+    if(window.memberstackDom){
+      ms = window.memberstackDom.init({ publicKey: MS_KEY });
+      checkSession();
+    } else {
+      setTimeout(initMS, 300);
+    }
+  } catch(e){ 
+    console.log('MS init error:', e);
+    // Show login wall anyway
+    document.getElementById('login-wall').style.display = 'flex';
+  }
+}
+
+async function checkSession(){
+  try{
+    const member = await ms.getCurrentMember();
+    if(member && member.data){
+      document.getElementById('login-wall').style.display = 'none';
+      try{
+        const s = localStorage.getItem('rh_profile2');
+        if(s){ profile = JSON.parse(s); showApp(); }
+        else { document.getElementById('ob-overlay').style.display = 'flex'; }
+      }catch(e){ document.getElementById('ob-overlay').style.display = 'flex'; }
+    } else {
+      document.getElementById('login-wall').style.display = 'flex';
+    }
+  } catch(e){
+    document.getElementById('login-wall').style.display = 'flex';
+  }
+}
 
 
 
@@ -725,27 +760,9 @@ document.getElementById('lw-signin-btn').addEventListener('click', async functio
   loadEl.style.display = 'block';
 
   try{
-    let success = false;
-    let errMsg = 'Invalid email or password. Please try again.';
-
-    if(window.$memberstackDom){
-      // Try loginMemberEmailPassword
-      if(window.$memberstackDom.loginMemberEmailPassword){
-        try{
-          const r = await window.$memberstackDom.loginMemberEmailPassword({ email, password });
-          if(r) success = true;
-        }catch(e1){ errMsg = e1.message || errMsg; console.log('login err:', e1); }
-      }
-      // Try login fallback
-      if(!success && window.$memberstackDom.login){
-        try{
-          const r = await window.$memberstackDom.login({ email, password });
-          if(r) success = true;
-        }catch(e2){ console.log('login2 err:', e2); }
-      }
-    }
-
-    if(success){
+    if(!ms){ errEl.textContent = 'Still loading, please try again.'; errEl.style.display='block'; btn.disabled=false; loadEl.style.display='none'; return; }
+    const result = await ms.loginMemberEmailPassword({ email, password });
+    if(result && result.data){
       document.getElementById('login-wall').style.display = 'none';
       try{
         const s = localStorage.getItem('rh_profile2');
@@ -753,13 +770,12 @@ document.getElementById('lw-signin-btn').addEventListener('click', async functio
         else { document.getElementById('ob-overlay').style.display = 'flex'; }
       }catch(e){ document.getElementById('ob-overlay').style.display = 'flex'; }
     } else {
-      errEl.textContent = errMsg;
+      errEl.textContent = 'Invalid email or password. Please try again.';
       errEl.style.display = 'block';
     }
   } catch(e){
-    errEl.textContent = e.message || 'Login failed. Please check your credentials.';
+    errEl.textContent = e.message || 'Invalid email or password.';
     errEl.style.display = 'block';
-    console.log('outer err:', e);
   }
 
   btn.disabled = false;
@@ -776,7 +792,7 @@ document.getElementById('h-edit-btn').insertAdjacentHTML('afterend',
   '<button class="h-edit" id="logout-btn" style="margin-left:4px">Log Out</button>'
 );
 document.getElementById('logout-btn').addEventListener('click', async function(){
-  try{ await window.$memberstackDom.logout(); }catch(e){}
+  try{ if(ms) await ms.logout(); }catch(e){}
   document.getElementById('app').style.display = 'none';
   document.getElementById('ob-overlay').style.display = 'none';
   document.getElementById('login-wall').style.display = 'flex';
@@ -784,35 +800,13 @@ document.getElementById('logout-btn').addEventListener('click', async function()
   document.getElementById('lw-password').value = '';
 });
 
-// Show login wall immediately — don't wait, no blank page
+// Show login wall immediately
 document.getElementById('login-wall').style.display = 'flex';
 document.getElementById('ob-overlay').style.display = 'none';
 document.getElementById('app').style.display = 'none';
 
-// Then check if already logged in once Memberstack is ready
-async function checkAlreadyLoggedIn(){
-  let attempts = 0;
-  const interval = setInterval(async () => {
-    attempts++;
-    if(window.$memberstackDom){
-      clearInterval(interval);
-      try{
-        const member = await window.$memberstackDom.getCurrentMember();
-        if(member && member.data){
-          // Already logged in — skip login wall
-          document.getElementById('login-wall').style.display = 'none';
-          try{
-            const s = localStorage.getItem('rh_profile2');
-            if(s){ profile = JSON.parse(s); showApp(); }
-            else { document.getElementById('ob-overlay').style.display = 'flex'; }
-          }catch(e){ document.getElementById('ob-overlay').style.display = 'flex'; }
-        }
-      }catch(e){}
-    }
-    if(attempts > 20) clearInterval(interval); // give up after 10s
-  }, 500);
-}
-checkAlreadyLoggedIn();
+// Start Memberstack
+window.addEventListener('load', initMS);
 
 </script>
 </body>
