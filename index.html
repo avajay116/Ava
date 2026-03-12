@@ -150,7 +150,7 @@
     <div class="ob-field"><label class="ob-label">Your First Name</label><input class="ob-input" id="ob-fname" placeholder="e.g. Sarah" maxlength="40"></div>
     <div class="ob-field"><label class="ob-label">Your Company / Mortgage Team</label><input class="ob-input" id="ob-company" placeholder="e.g. ABC Home Mortgage" maxlength="60"></div>
     <div class="ob-field"><label class="ob-label">Your Title (optional)</label><input class="ob-input" id="ob-title" placeholder="e.g. Loan Officer" maxlength="40"></div>
-    <button class="ob-btn" onclick="completeOnboarding()">Get Started →</button>
+    <button class="ob-btn" id="ob-submit-btn">Get Started →</button>
     <div class="ob-note">Your info is saved in your browser only and never shared.</div>
   </div>
 </div>
@@ -232,7 +232,15 @@ const PER_PAGE=10;
 let contactedStatus={},realtorNotes={},activeFilter='all',currentScriptType={};
 
 function loadProfile(){
-  try{const s=localStorage.getItem('rh_profile');if(s){userProfile=JSON.parse(s);applyProfile();document.getElementById('onboarding').classList.add('hidden');}}catch(e){}
+  try{
+    const s=localStorage.getItem('rh_profile');
+    if(s){
+      userProfile=JSON.parse(s);
+      document.getElementById('header-user').textContent=userProfile.fname+' — '+userProfile.title;
+      document.getElementById('header-company').textContent=userProfile.company;
+      document.getElementById('onboarding').style.display='none';
+    }
+  }catch(e){}
 }
 function completeOnboarding(){
   const fname=document.getElementById('ob-fname').value.trim();
@@ -533,6 +541,23 @@ function saveNote(id){realtorNotes[id]=document.getElementById('note-'+id).value
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 buildFilterBtns();
 loadProfile();
+
+// Wire up Get Started button safely
+document.getElementById('ob-submit-btn').addEventListener('click', function(){
+  const fname = document.getElementById('ob-fname').value.trim();
+  const company = document.getElementById('ob-company').value.trim();
+  const title = document.getElementById('ob-title').value.trim() || 'Loan Officer';
+  if(!fname || !company){
+    alert('Please enter your first name and company.');
+    return;
+  }
+  userProfile = {fname, company, title};
+  try{ localStorage.setItem('rh_profile', JSON.stringify(userProfile)); }catch(e){}
+  document.getElementById('header-user').textContent = fname + ' — ' + title;
+  document.getElementById('header-company').textContent = company;
+  document.getElementById('onboarding').style.display = 'none';
+});
+
 </script>
 </body>
 </html>
