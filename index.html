@@ -231,6 +231,38 @@ let allRealtors=[],filteredRealtors=[],selectedId=null,currentPage=1;
 const PER_PAGE=10;
 let contactedStatus={},realtorNotes={},activeFilter='all',currentScriptType={};
 
+function loadProfile(){
+  try{const s=localStorage.getItem('rh_profile');if(s){userProfile=JSON.parse(s);applyProfile();document.getElementById('onboarding').classList.add('hidden');}}catch(e){}
+}
+function completeOnboarding(){
+  const fname=document.getElementById('ob-fname').value.trim();
+  const company=document.getElementById('ob-company').value.trim();
+  const title=document.getElementById('ob-title').value.trim()||'Loan Officer';
+  if(!fname||!company){showToast('Please enter your name and company');return;}
+  userProfile={fname,company,title};
+  try{localStorage.setItem('rh_profile',JSON.stringify(userProfile));}catch(e){}
+  applyProfile();
+  document.getElementById('onboarding').classList.add('hidden');
+  showToast('Welcome, '+fname+'! Search your market to get started.');
+}
+function applyProfile(){
+  document.getElementById('header-user').textContent=userProfile.fname+' — '+userProfile.title;
+  document.getElementById('header-company').textContent=userProfile.company;
+}
+function editProfile(){
+  document.getElementById('ob-fname').value=userProfile.fname;
+  document.getElementById('ob-company').value=userProfile.company;
+  document.getElementById('ob-title').value=userProfile.title;
+  document.getElementById('onboarding').classList.remove('hidden');
+}
+function initials(name){
+  const p=name.trim().split(' ');
+  return p.length>=2?(p[0][0]+p[p.length-1][0]).toUpperCase():name.substring(0,2).toUpperCase();
+}
+function getColor(name){
+  let h=0;for(let i=0;i<name.length;i++)h=name.charCodeAt(i)+((h<<5)-h);
+  return AVATAR_COLORS[Math.abs(h)%AVATAR_COLORS.length];
+}
 function getCached(area){
   try{
     const key=CACHE_KEY_PREFIX+area.toLowerCase().replace(/\s+/g,'_');
