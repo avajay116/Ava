@@ -725,24 +725,41 @@ document.getElementById('lw-signin-btn').addEventListener('click', async functio
   loadEl.style.display = 'block';
 
   try{
-    const result = await window.$memberstackDom.loginMemberEmailPassword({
-      email, password
-    });
-    if(result && result.data){
+    let success = false;
+    let errMsg = 'Invalid email or password. Please try again.';
+
+    if(window.$memberstackDom){
+      // Try loginMemberEmailPassword
+      if(window.$memberstackDom.loginMemberEmailPassword){
+        try{
+          const r = await window.$memberstackDom.loginMemberEmailPassword({ email, password });
+          if(r) success = true;
+        }catch(e1){ errMsg = e1.message || errMsg; console.log('login err:', e1); }
+      }
+      // Try login fallback
+      if(!success && window.$memberstackDom.login){
+        try{
+          const r = await window.$memberstackDom.login({ email, password });
+          if(r) success = true;
+        }catch(e2){ console.log('login2 err:', e2); }
+      }
+    }
+
+    if(success){
       document.getElementById('login-wall').style.display = 'none';
-      // Show onboarding or app based on saved profile
       try{
         const s = localStorage.getItem('rh_profile2');
         if(s){ profile = JSON.parse(s); showApp(); }
         else { document.getElementById('ob-overlay').style.display = 'flex'; }
       }catch(e){ document.getElementById('ob-overlay').style.display = 'flex'; }
     } else {
-      errEl.textContent = 'Invalid email or password. Please try again.';
+      errEl.textContent = errMsg;
       errEl.style.display = 'block';
     }
   } catch(e){
-    errEl.textContent = 'Invalid email or password. Please try again.';
+    errEl.textContent = e.message || 'Login failed. Please check your credentials.';
     errEl.style.display = 'block';
+    console.log('outer err:', e);
   }
 
   btn.disabled = false;
