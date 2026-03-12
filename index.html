@@ -214,10 +214,30 @@
 const APIFY_TOKEN='apify_api_XCQGzWHBsZHgKeGMbNdgRSZehZrIHO459Ok5';
 const ACTOR_ID='api-empire~realtor-com-agents-by-zip-code-scraper';
 const AVATAR_COLORS=['#5C4033','#8B6F47','#3B5068','#2E5E4A','#614B32','#3D4F68','#5E3A2E','#4A6040'];
+const CACHE_KEY_PREFIX='rh_cache_';
+const CACHE_TTL_HOURS=24;
 let userProfile={fname:'',company:'',title:'Loan Officer'};
 let allRealtors=[],filteredRealtors=[],selectedId=null,currentPage=1;
 const PER_PAGE=10;
 let contactedStatus={},realtorNotes={},activeFilter='all',currentScriptType={};
+
+function getCached(area){
+  try{
+    const key=CACHE_KEY_PREFIX+area.toLowerCase().replace(/\s+/g,'_');
+    const raw=localStorage.getItem(key);
+    if(!raw)return null;
+    const {data,timestamp}=JSON.parse(raw);
+    const ageHours=(Date.now()-timestamp)/3600000;
+    if(ageHours>CACHE_TTL_HOURS){localStorage.removeItem(key);return null;}
+    return data;
+  }catch(e){return null;}
+}
+function setCache(area,data){
+  try{
+    const key=CACHE_KEY_PREFIX+area.toLowerCase().replace(/\s+/g,'_');
+    localStorage.setItem(key,JSON.stringify({data,timestamp:Date.now()}));
+  }catch(e){}
+}
 
 function loadProfile(){
   try{const s=localStorage.getItem('rh_profile');if(s){userProfile=JSON.parse(s);applyProfile();document.getElementById('onboarding').classList.add('hidden');}}catch(e){}
@@ -257,6 +277,23 @@ async function runSearch(){
   if(!area){showToast('Please enter a ZIP code or city');return;}
   const btn=document.getElementById('search-btn');
   btn.disabled=true;btn.textContent='Searching...';
+
+  // Check cache first — instant load if we have it
+  const cached=getCached(area);
+  if(cached){
+    allRealtors=cached;
+    const sort=document.getElementById('sort-select').value;
+    if(sort==='sold')allRealtors.sort((a,b)=>b.soldCount-a.soldCount);
+    else if(sort==='listings')allRealtors.sort((a,b)=>b.listingCount-a.listingCount);
+    else allRealtors.sort((a,b)=>a.name.localeCompare(b.name));
+    allRealtors.forEach((r,i)=>r.rank=i+1);
+    activeFilter='all';currentPage=1;selectedId=null;
+    updateStats();buildFilterBtns();applyFilter();renderDetail(null);
+    btn.disabled=false;btn.textContent='Search Market ↗';
+    showToast('⚡ Loaded from cache — instant results!');
+    return;
+  }
+
   document.getElementById('list-panel').innerHTML=`<div class="loading-state"><div class="loading-spinner"></div><div style="font-family:var(--font-display);font-size:18px;color:var(--charcoal);margin-bottom:8px">Pulling Real Realtors...</div><div style="font-size:13px">Fetching live data from Realtor.com for ${area}</div></div>`;
   try{
     const runRes=await fetch(`https://api.apify.com/v2/acts/${ACTOR_ID}/runs?token=${APIFY_TOKEN}`,{
@@ -297,6 +334,7 @@ async function runSearch(){
     else if(sort==='listings')allRealtors.sort((a,b)=>b.listingCount-a.listingCount);
     else allRealtors.sort((a,b)=>a.name.localeCompare(b.name));
     allRealtors.forEach((r,i)=>r.rank=i+1);
+    setCache(area,allRealtors);
     activeFilter='all';currentPage=1;selectedId=null;
     updateStats();buildFilterBtns();applyFilter();renderDetail(null);
   }catch(err){
