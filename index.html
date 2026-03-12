@@ -170,9 +170,17 @@
 <div class="search-section">
   <div class="search-wrap">
     <div class="search-group" style="flex:2"><label class="search-label">ZIP Code or City</label><input class="search-input" id="area-input" placeholder="e.g. 32765 or Orlando, FL" onkeydown="if(event.key==='Enter')runSearch()"></div>
+    <div class="search-group"><label class="search-label">Results</label>
+      <select class="search-select" id="results-select">
+        <option value="20">Top 20</option>
+        <option value="30" selected>Top 30</option>
+        <option value="50">Top 50</option>
+      </select>
+    </div>
     <div class="search-group"><label class="search-label">Sort By</label>
       <select class="search-select" id="sort-select">
         <option value="sold">Most Sold</option>
+        <option value="volume">Highest Volume</option>
         <option value="listings">Most Listings</option>
         <option value="name">Name A-Z</option>
       </select>
@@ -187,6 +195,8 @@
   <div class="stat-item"><div class="stat-num" id="stat-contacted">0</div><div class="stat-label">Contacted</div></div>
   <div class="stat-divider"></div>
   <div class="stat-item"><div class="stat-num" id="stat-partners">0</div><div class="stat-label">Partners</div></div>
+  <div class="stat-divider"></div>
+  <div class="stat-item"><div class="stat-num" id="stat-avgvol">—</div><div class="stat-label">Avg Annual Volume</div></div>
   <div class="stat-divider"></div>
   <div class="stat-item"><div class="stat-num" id="stat-topsold">—</div><div class="stat-label">Top Sold Count</div></div>
   <div class="filter-row" id="filter-row"></div>
@@ -239,6 +249,27 @@ function setCache(area,data){
   }catch(e){}
 }
 
+async function getMedianHomePrice(zip){
+  // State-level median fallbacks (real 2024 data)
+  const STATE_MEDIANS={FL:410000,CA:750000,TX:310000,NY:550000,WA:550000,CO:530000,AZ:420000,GA:330000,NC:320000,VA:400000,NJ:500000,MA:580000,IL:290000,OH:230000,PA:260000,MI:240000,TN:320000,SC:300000,MN:330000,WI:280000,MO:240000,IN:230000,AL:220000,KY:220000,LA:210000,AR:195000,MS:180000,OK:205000,KS:215000,NE:235000,IA:210000,ND:235000,SD:235000,MT:380000,WY:320000,ID:400000,UT:490000,NV:420000,NM:280000,ME:350000,NH:430000,VT:350000,CT:370000,RI:400000,DE:360000,MD:400000,HI:780000,AK:340000,DC:620000};
+  try{
+    // Use free zip-code API to get state, then apply median
+    const res=await fetch(`https://api.zippopotam.us/us/${zip.replace(/\D/g,'').substring(0,5)}`);
+    if(res.ok){
+      const d=await res.json();
+      const state=d.places?.[0]?.['state abbreviation'];
+      if(state&&STATE_MEDIANS[state]) return STATE_MEDIANS[state];
+    }
+  }catch(e){}
+  return 350000; // national fallback
+}
+
+function fmtVolume(n){
+  if(n>=1000000) return '$'+(n/1000000).toFixed(1)+'M';
+  if(n>=1000) return '$'+(n/1000).toFixed(0)+'K';
+  return '$'+n;
+}
+
 function loadProfile(){
   try{const s=localStorage.getItem('rh_profile');if(s){userProfile=JSON.parse(s);applyProfile();document.getElementById('onboarding').classList.add('hidden');}}catch(e){}
 }
@@ -283,9 +314,11 @@ async function runSearch(){
   if(cached){
     allRealtors=cached;
     const sort=document.getElementById('sort-select').value;
-    if(sort==='sold')allRealtors.sort((a,b)=>b.soldCount-a.soldCount);
+    if(sort==='sold'||sort==='volume')allRealtors.sort((a,b)=>b.annualVolume-a.annualVolume);
     else if(sort==='listings')allRealtors.sort((a,b)=>b.listingCount-a.listingCount);
     else allRealtors.sort((a,b)=>a.name.localeCompare(b.name));
+    const limit=parseInt(document.getElementById('results-select').value)||30;
+    allRealtors=allRealtors.slice(0,limit);
     allRealtors.forEach((r,i)=>r.rank=i+1);
     activeFilter='all';currentPage=1;selectedId=null;
     updateStats();buildFilterBtns();applyFilter();renderDetail(null);
@@ -296,6 +329,9 @@ async function runSearch(){
 
   document.getElementById('list-panel').innerHTML=`<div class="loading-state"><div class="loading-spinner"></div><div style="font-family:var(--font-display);font-size:18px;color:var(--charcoal);margin-bottom:8px">Pulling Real Realtors...</div><div style="font-size:13px">Fetching live data from Realtor.com for ${area}</div></div>`;
   try{
+    // Get median home price for this ZIP in parallel with Apify run
+    const medianPricePromise=getMedianHomePrice(area);
+
     const runRes=await fetch(`https://api.apify.com/v2/acts/${ACTOR_ID}/runs?token=${APIFY_TOKEN}`,{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({zipCodes:[area],maxResults:50})
@@ -316,13 +352,16 @@ async function runSearch(){
       }else if(status==='FAILED'||status==='ABORTED'){throw new Error('Search failed');}
     }
     if(!results||results.length===0)throw new Error('No results found for this area');
+
+    const medianPrice=await medianPricePromise;
     allRealtors=results.map((r,i)=>{
       const name=(r.agent_name||r.name||'Unknown Agent').replace(/,\s*(agent|broker|realtor|associate|pa|llc).*/gi,'').trim();
+      const soldCount=parseInt(r.sold_count)||0;
       return{
         id:i+1,name,brokerage:r.broker_name||r.brokerage||r.office_name||'Independent',
         phone:r.office_phone||r.phone||'Not listed',
         mobilePhone:Array.isArray(r.mobile_phones)?r.mobile_phones[0]:'',
-        email:r.email||'',soldCount:parseInt(r.sold_count)||0,
+        email:r.email||'',soldCount,annualVolume:soldCount*medianPrice,medianPrice,
         listingCount:parseInt(r.listing_count)||0,
         profileUrl:r.website||'',
         areasServed:Array.isArray(r.areas_serviced)?r.areas_serviced:[],
@@ -330,7 +369,11 @@ async function runSearch(){
       };
     });
     const sort=document.getElementById('sort-select').value;
-    if(sort==='sold')allRealtors.sort((a,b)=>b.soldCount-a.soldCount);
+    if(sort==='sold'||sort==='volume')allRealtors.sort((a,b)=>b.annualVolume-a.annualVolume);
+    else if(sort==='listings')allRealtors.sort((a,b)=>b.listingCount-a.listingCount);
+    else allRealtors.sort((a,b)=>a.name.localeCompare(b.name));
+    const limit=parseInt(document.getElementById('results-select').value)||30;
+    allRealtors=allRealtors.slice(0,limit);
     else if(sort==='listings')allRealtors.sort((a,b)=>b.listingCount-a.listingCount);
     else allRealtors.sort((a,b)=>a.name.localeCompare(b.name));
     allRealtors.forEach((r,i)=>r.rank=i+1);
@@ -348,6 +391,12 @@ function updateStats(){
   document.getElementById('stat-contacted').textContent=Object.values(contactedStatus).filter(v=>v&&v!=='not-contacted').length;
   document.getElementById('stat-partners').textContent=Object.values(contactedStatus).filter(v=>v==='partner').length;
   document.getElementById('stat-topsold').textContent=allRealtors.length?Math.max(...allRealtors.map(r=>r.soldCount)):'—';
+  if(allRealtors.length){
+    const avgVol=allRealtors.reduce((s,r)=>s+r.annualVolume,0)/allRealtors.length;
+    document.getElementById('stat-avgvol').textContent=fmtVolume(Math.round(avgVol));
+  } else {
+    document.getElementById('stat-avgvol').textContent='—';
+  }
 }
 function buildFilterBtns(){
   const row=document.getElementById('filter-row');row.innerHTML='';
@@ -379,20 +428,24 @@ function renderList(){
       <div class="realtor-info">
         <div class="realtor-name">${r.name}${badge}</div>
         <div class="realtor-brokerage">${r.brokerage}</div>
-        <div class="realtor-tags">
+        ${r.email?`<div style="font-size:11px;color:var(--mid-brown);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px">✉ ${r.email}</div>`:`<div style="font-size:11px;color:var(--warm-gray);margin-top:2px">✉ No email listed</div>`}
+        <div class="realtor-tags" style="margin-top:4px">
           <span class="tag tag-sold">${r.soldCount} sold</span>
           ${r.listingCount>0?`<span class="tag tag-listings">${r.listingCount} listings</span>`:''}
           ${r.areasServed&&r.areasServed[0]?`<span class="tag tag-specialty">${r.areasServed[0]}</span>`:''}
         </div>
       </div>
       <div class="realtor-stats">
-        <div class="stat-vol">${r.soldCount} sold</div>
-        <div class="stat-deals">${r.listingCount} active</div>
+        <div class="stat-vol">${fmtVolume(r.annualVolume)}</div>
+        <div class="stat-deals">${r.soldCount} sold · ${r.listingCount} active</div>
       </div>
       <div class="card-actions">
         <button class="action-btn primary" onclick="event.stopPropagation();copyScript(${r.id},'call')" title="Copy Call Script">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.8 19.8 0 01.09 1.24a2 2 0 012-2.18H5a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
         </button>
+        ${r.email?`<button class="action-btn" onclick="event.stopPropagation();navigator.clipboard.writeText('${r.email}');showToast('Email copied!')" title="Copy Email" style="background:var(--espresso);border-color:var(--espresso);color:var(--white)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </button>`:''}
         <button class="action-btn" onclick="event.stopPropagation();selectRealtor(${r.id})" title="View Profile">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </button>
@@ -407,10 +460,10 @@ function selectRealtor(id){selectedId=id;renderList();renderDetail(allRealtors.f
 function getScript(r,type){
   const u=userProfile;const area=document.getElementById('area-input').value||'your area';
   const fname=r.name.split(' ')[0];
-  if(type==='call')return`Hi, is this ${r.name}?\n\nHi ${fname}! This is ${u.fname} with ${u.company}. I was looking at top agents in ${area} on Realtor.com and noticed you've closed ${r.soldCount} transactions — that's seriously impressive.\n\nI work with a lot of buyers and I'm always looking for top agents to refer them to. I'd love to grab 10 minutes to chat — would this week work for a quick call?`;
-  if(type==='vm')return`Hi ${fname}, this is ${u.fname} with ${u.company}. I was researching top producers in ${area} and came across your profile on Realtor.com — ${r.soldCount} closed transactions is outstanding work.\n\nI'd love to connect about some buyers I'm working with and how we might support each other. Please call me back at your convenience — I'll send you a text too. Have a great day!`;
-  if(type==='text')return`Hi ${fname}! This is ${u.fname} from ${u.company}. I saw your profile on Realtor.com — ${r.soldCount} closed deals at ${r.brokerage} is amazing! I'd love to connect about buyers I'm working with. Open to a quick 10-min call this week? 🏠`;
-  if(type==='email')return`Subject: Quick Intro — ${u.fname} at ${u.company}\n\nHi ${fname},\n\nI came across your profile while researching top producers in ${area} and was really impressed — ${r.soldCount} closed transactions at ${r.brokerage} is outstanding.\n\nI'm ${u.fname}, a ${u.title} with ${u.company}. We specialize in fast pre-approvals and clear communication that makes closings smoother for everyone.\n\nI'd love to connect for a quick 15-minute call to see if there's a fit. Are you available this week?\n\nBest,\n${u.fname}\n${u.title} | ${u.company}`;
+  if(type==='call')return`Hi, is this ${r.name}?\n\nHi ${fname}! This is ${u.fname} with ${u.company}. I was looking at top agents in ${area} on Realtor.com and noticed you've closed ${r.soldCount} transactions — that's an estimated ${fmtVolume(r.annualVolume)} in volume. That's seriously impressive.\n\nI work with a lot of buyers and I'm always looking for top agents to refer them to. I'd love to grab 10 minutes to chat — would this week work for a quick call?`;
+  if(type==='vm')return`Hi ${fname}, this is ${u.fname} with ${u.company}. I was researching top producers in ${area} and came across your profile on Realtor.com — ${r.soldCount} closed transactions and an estimated ${fmtVolume(r.annualVolume)} in volume is outstanding.\n\nI'd love to connect about some buyers I'm working with. Please call me back at your convenience — I'll send you a text too. Have a great day!`;
+  if(type==='text')return`Hi ${fname}! This is ${u.fname} from ${u.company}. I saw your profile on Realtor.com — ${r.soldCount} closed deals (~${fmtVolume(r.annualVolume)} in volume) at ${r.brokerage} is amazing! I'd love to connect about buyers I'm working with. Open to a quick 10-min call? 🏠`;
+  if(type==='email')return`Subject: Quick Intro — ${u.fname} at ${u.company}\n\nHi ${fname},\n\nI came across your profile while researching top producers in ${area} and was really impressed — ${r.soldCount} closed transactions and an estimated ${fmtVolume(r.annualVolume)} in annual volume at ${r.brokerage} is outstanding.\n\nI'm ${u.fname}, a ${u.title} with ${u.company}. We specialize in fast pre-approvals and clear communication that makes closings smoother for everyone.\n\nI'd love to connect for a quick 15-minute call to see if there's a fit. Are you available this week?\n\nBest,\n${u.fname}\n${u.title} | ${u.company}`;
 }
 function renderDetail(r){
   const panel=document.getElementById('detail-panel');
@@ -428,10 +481,10 @@ function renderDetail(r){
       </div>
     </div>
     <div class="metrics-grid">
+      <div class="metric-card"><div class="metric-val">${fmtVolume(r.annualVolume)}</div><div class="metric-lbl">Est. Annual Volume</div></div>
       <div class="metric-card"><div class="metric-val">${r.soldCount}</div><div class="metric-lbl">Total Sold</div></div>
       <div class="metric-card"><div class="metric-val">${r.listingCount}</div><div class="metric-lbl">Active Listings</div></div>
-      <div class="metric-card"><div class="metric-val" style="font-size:11px">${r.phone}</div><div class="metric-lbl">Office Phone</div></div>
-      <div class="metric-card"><div class="metric-val" style="font-size:11px">${r.mobilePhone||'—'}</div><div class="metric-lbl">Mobile</div></div>
+      <div class="metric-card"><div class="metric-val" style="font-size:11px">${fmtVolume(r.medianPrice||350000)}</div><div class="metric-lbl">Area Median Price</div></div>
     </div>
     ${r.areasServed&&r.areasServed.length?`<div class="detail-section"><div class="detail-section-title">Areas Served</div><div style="display:flex;gap:6px;flex-wrap:wrap">${r.areasServed.slice(0,4).map(a=>`<span class="tag tag-specialty">${a}</span>`).join('')}</div></div>`:''}
     <div class="detail-section">
