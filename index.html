@@ -760,7 +760,18 @@ document.getElementById('lw-signin-btn').addEventListener('click', async functio
   loadEl.style.display = 'block';
 
   try{
-    if(!ms){ errEl.textContent = 'Still loading, please try again.'; errEl.style.display='block'; btn.disabled=false; loadEl.style.display='none'; return; }
+    // If ms not ready yet, wait for it
+    if(!ms){
+      loadEl.textContent = 'Connecting... please wait';
+      loadEl.style.display = 'block';
+      let waited = 0;
+      while(!ms && waited < 5000){
+        await new Promise(r => setTimeout(r, 200));
+        waited += 200;
+      }
+      loadEl.textContent = 'Signing in...';
+    }
+    if(!ms){ errEl.textContent = 'Could not connect. Please refresh the page and try again.'; errEl.style.display='block'; btn.disabled=false; loadEl.style.display='none'; return; }
     const result = await ms.loginMemberEmailPassword({ email, password });
     if(result && result.data){
       document.getElementById('login-wall').style.display = 'none';
