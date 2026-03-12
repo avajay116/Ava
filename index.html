@@ -4,10 +4,33 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RealtorHunter</title>
+<script src="https://cdn.memberstack.com/scripts/webflow/memberstack.js" data-memberstack-app="pk_3715849099a462f29b1e" defer></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size:14px;min-height:100vh}
+
+/* LOGIN WALL */
+#login-wall{position:fixed;inset:0;background:#2C1810;display:flex;align-items:center;justify-content:center;z-index:99999;padding:1rem}
+#login-card{background:#FAFAF8;border-radius:20px;padding:2.5rem;max-width:420px;width:100%;text-align:center}
+.lw-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:1.5rem}
+.lw-logo-box{width:44px;height:44px;background:#2C1810;border-radius:12px;display:flex;align-items:center;justify-content:center}
+.lw-logo-box svg{width:22px;height:22px;fill:#C4A882}
+.lw-logo-name{font-family:'Playfair Display',serif;font-size:24px;color:#2C1810}
+.lw-title{font-family:'Playfair Display',serif;font-size:20px;color:#2C1810;margin-bottom:6px}
+.lw-sub{font-size:13px;color:#9A9590;margin-bottom:1.5rem;line-height:1.6}
+.lw-label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8B6F47;font-weight:600;margin-bottom:5px;text-align:left}
+.lw-input{width:100%;background:#fff;border:1.5px solid #E8E5E0;border-radius:10px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:14px;color:#1A1A1A;outline:none;margin-bottom:1rem}
+.lw-input:focus{border-color:#C4A882}
+.lw-btn{width:100%;background:#2C1810;color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:10px}
+.lw-btn:hover{background:#5C4033}
+.lw-btn:disabled{opacity:.6;cursor:not-allowed}
+.lw-divider{height:1px;background:#E8E5E0;margin:1rem 0}
+.lw-signup{font-size:13px;color:#9A9590}
+.lw-signup a{color:#8B6F47;font-weight:600;text-decoration:none}
+.lw-signup a:hover{color:#2C1810}
+.lw-error{background:#FFEBEE;border:1px solid #FFCDD2;border-radius:8px;padding:10px 14px;font-size:13px;color:#C62828;margin-bottom:1rem;display:none}
+.lw-loading{font-size:13px;color:#9A9590;margin-top:8px;display:none}
 
 /* ONBOARDING */
 #ob-overlay{position:fixed;inset:0;background:#2C1810;display:flex;align-items:center;justify-content:center;z-index:9999;padding:1rem}
@@ -142,6 +165,29 @@ body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size
 </style>
 </head>
 <body>
+
+<!-- LOGIN WALL -->
+<div id="login-wall">
+  <div id="login-card">
+    <div class="lw-logo">
+      <div class="lw-logo-box">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22" fill="none" stroke="#C4A882" stroke-width="1.5"/></svg>
+      </div>
+      <div class="lw-logo-name">RealtorHunter</div>
+    </div>
+    <div class="lw-title">Member Login</div>
+    <div class="lw-sub">Sign in to access your realtor prospecting dashboard.</div>
+    <div class="lw-error" id="lw-error">Invalid email or password. Please try again.</div>
+    <label class="lw-label">Email Address</label>
+    <input class="lw-input" id="lw-email" type="email" placeholder="you@email.com">
+    <label class="lw-label">Password</label>
+    <input class="lw-input" id="lw-password" type="password" placeholder="Your password">
+    <button class="lw-btn" id="lw-signin-btn">Sign In →</button>
+    <div class="lw-loading" id="lw-loading">Signing in...</div>
+    <div class="lw-divider"></div>
+    <div class="lw-signup">Not a member yet? <a href="https://avaflare35.gumroad.com/l/realtorhunter" target="_blank">Subscribe for $29/month →</a></div>
+  </div>
+</div>
 
 <!-- ONBOARDING OVERLAY -->
 <div id="ob-overlay">
@@ -654,6 +700,103 @@ function saveNote(id){
 
 // Init filters
 buildFilters();
+
+// ─── MEMBERSTACK AUTH ─────────────────────────────────────
+const MS_KEY = 'pk_3715849099a462f29b1e';
+
+
+
+// Sign in button
+document.getElementById('lw-signin-btn').addEventListener('click', async function(){
+  const email = document.getElementById('lw-email').value.trim();
+  const password = document.getElementById('lw-password').value;
+  const errEl = document.getElementById('lw-error');
+  const loadEl = document.getElementById('lw-loading');
+  const btn = document.getElementById('lw-signin-btn');
+
+  if(!email || !password){
+    errEl.textContent = 'Please enter your email and password.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  loadEl.style.display = 'block';
+
+  try{
+    const result = await window.$memberstackDom.loginMemberEmailPassword({
+      email, password
+    });
+    if(result && result.data){
+      document.getElementById('login-wall').style.display = 'none';
+      // Show onboarding or app based on saved profile
+      try{
+        const s = localStorage.getItem('rh_profile2');
+        if(s){ profile = JSON.parse(s); showApp(); }
+        else { document.getElementById('ob-overlay').style.display = 'flex'; }
+      }catch(e){ document.getElementById('ob-overlay').style.display = 'flex'; }
+    } else {
+      errEl.textContent = 'Invalid email or password. Please try again.';
+      errEl.style.display = 'block';
+    }
+  } catch(e){
+    errEl.textContent = 'Invalid email or password. Please try again.';
+    errEl.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  loadEl.style.display = 'none';
+});
+
+// Enter key on password field
+document.getElementById('lw-password').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') document.getElementById('lw-signin-btn').click();
+});
+
+// Add logout button to header
+document.getElementById('h-edit-btn').insertAdjacentHTML('afterend', 
+  '<button class="h-edit" id="logout-btn" style="margin-left:4px">Log Out</button>'
+);
+document.getElementById('logout-btn').addEventListener('click', async function(){
+  try{ await window.$memberstackDom.logout(); }catch(e){}
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('ob-overlay').style.display = 'none';
+  document.getElementById('login-wall').style.display = 'flex';
+  document.getElementById('lw-email').value = '';
+  document.getElementById('lw-password').value = '';
+});
+
+// Show login wall immediately — don't wait, no blank page
+document.getElementById('login-wall').style.display = 'flex';
+document.getElementById('ob-overlay').style.display = 'none';
+document.getElementById('app').style.display = 'none';
+
+// Then check if already logged in once Memberstack is ready
+async function checkAlreadyLoggedIn(){
+  let attempts = 0;
+  const interval = setInterval(async () => {
+    attempts++;
+    if(window.$memberstackDom){
+      clearInterval(interval);
+      try{
+        const member = await window.$memberstackDom.getCurrentMember();
+        if(member && member.data){
+          // Already logged in — skip login wall
+          document.getElementById('login-wall').style.display = 'none';
+          try{
+            const s = localStorage.getItem('rh_profile2');
+            if(s){ profile = JSON.parse(s); showApp(); }
+            else { document.getElementById('ob-overlay').style.display = 'flex'; }
+          }catch(e){ document.getElementById('ob-overlay').style.display = 'flex'; }
+        }
+      }catch(e){}
+    }
+    if(attempts > 20) clearInterval(interval); // give up after 10s
+  }, 500);
+}
+checkAlreadyLoggedIn();
+
 </script>
 </body>
 </html>
