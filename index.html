@@ -9,27 +9,38 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size:14px;min-height:100vh}
 
-/* LOGIN WALL */
-#login-wall{position:fixed;inset:0;background:#2C1810;display:flex;align-items:center;justify-content:center;z-index:99999;padding:1rem}
-#login-card{background:#FAFAF8;border-radius:20px;padding:2.5rem;max-width:420px;width:100%;text-align:center}
-.lw-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:1.5rem}
-.lw-logo-box{width:44px;height:44px;background:#2C1810;border-radius:12px;display:flex;align-items:center;justify-content:center}
-.lw-logo-box svg{width:22px;height:22px;fill:#C4A882}
-.lw-logo-name{font-family:'Playfair Display',serif;font-size:24px;color:#2C1810}
-.lw-title{font-family:'Playfair Display',serif;font-size:20px;color:#2C1810;margin-bottom:6px}
-.lw-sub{font-size:13px;color:#9A9590;margin-bottom:1.5rem;line-height:1.6}
-.lw-label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8B6F47;font-weight:600;margin-bottom:5px;text-align:left}
-.lw-input{width:100%;background:#fff;border:1.5px solid #E8E5E0;border-radius:10px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:14px;color:#1A1A1A;outline:none;margin-bottom:1rem}
-.lw-input:focus{border-color:#C4A882}
-.lw-btn{width:100%;background:#2C1810;color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:10px}
-.lw-btn:hover{background:#5C4033}
-.lw-btn:disabled{opacity:.6;cursor:not-allowed}
-.lw-divider{height:1px;background:#E8E5E0;margin:1rem 0}
-.lw-signup{font-size:13px;color:#9A9590}
-.lw-signup a{color:#8B6F47;font-weight:600;text-decoration:none}
-.lw-signup a:hover{color:#2C1810}
-.lw-error{background:#FFEBEE;border:1px solid #FFCDD2;border-radius:8px;padding:10px 14px;font-size:13px;color:#C62828;margin-bottom:1rem;display:none}
-.lw-loading{font-size:13px;color:#9A9590;margin-top:8px;display:none}
+/* AUTH WALL */
+#auth-wall{position:fixed;inset:0;background:#2C1810;display:flex;align-items:center;justify-content:center;z-index:99999;padding:1rem;overflow-y:auto}
+#auth-card{background:#FAFAF8;border-radius:20px;padding:2.5rem;max-width:440px;width:100%;text-align:center;margin:auto}
+.aw-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:.5rem}
+.aw-logo-box{width:44px;height:44px;background:#2C1810;border-radius:12px;display:flex;align-items:center;justify-content:center}
+.aw-logo-box svg{width:22px;height:22px;fill:#C4A882}
+.aw-logo-name{font-family:'Playfair Display',serif;font-size:24px;color:#2C1810}
+.aw-tagline{font-size:12px;color:#9A9590;margin-bottom:1.5rem;line-height:1.5}
+.aw-tabs{display:flex;background:#F0EDE8;border-radius:10px;padding:4px;margin-bottom:1.25rem;gap:4px}
+.aw-tab{flex:1;padding:9px;border:none;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;background:transparent;color:#9A9590;transition:all .2s}
+.aw-tab.on{background:#2C1810;color:#fff}
+.aw-error{background:#FFEBEE;border:1px solid #FFCDD2;border-radius:8px;padding:10px 14px;font-size:13px;color:#C62828;margin-bottom:1rem;display:none;text-align:left}
+.aw-success{background:#E8F5E9;border:1px solid #C8E6C9;border-radius:8px;padding:10px 14px;font-size:13px;color:#2E7D32;margin-bottom:1rem;display:none;text-align:left}
+.aw-label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8B6F47;font-weight:600;margin-bottom:5px;text-align:left}
+.aw-input{width:100%;background:#fff;border:1.5px solid #E8E5E0;border-radius:10px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:14px;color:#1A1A1A;outline:none;margin-bottom:1rem}
+.aw-input:focus{border-color:#C4A882}
+.aw-btn{width:100%;background:#2C1810;color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:8px;transition:background .2s}
+.aw-btn:hover{background:#5C4033}
+.aw-btn:disabled{opacity:.6;cursor:not-allowed}
+.aw-loading{font-size:12px;color:#9A9590;margin-bottom:8px;display:none}
+.aw-forgot{font-size:12px;color:#9A9590;margin-top:4px}
+.aw-forgot a{color:#8B6F47;text-decoration:none;font-weight:500}
+.aw-forgot a:hover{color:#2C1810}
+.aw-back{font-size:12px;margin-bottom:1rem;text-align:left}
+.aw-back a{color:#8B6F47;text-decoration:none;font-weight:500}
+.aw-plan-box{background:#F5F3EF;border:1.5px solid #E8E5E0;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;text-align:left}
+.aw-plan-title{font-family:'Playfair Display',serif;font-size:14px;color:#2C1810;margin-bottom:4px}
+.aw-plan-price{font-family:'Playfair Display',serif;font-size:28px;color:#5C4033;margin-bottom:8px}
+.aw-plan-price span{font-size:14px;color:#9A9590;font-family:'DM Sans',sans-serif}
+.aw-plan-features{display:flex;flex-direction:column;gap:5px}
+.aw-feat{font-size:12px;color:#1A1A1A}
+.aw-secure{font-size:11px;color:#9A9590;margin-top:8px}
 
 /* ONBOARDING */
 #ob-overlay{position:fixed;inset:0;background:#2C1810;display:flex;align-items:center;justify-content:center;z-index:9999;padding:1rem}
@@ -165,26 +176,72 @@ body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size
 </head>
 <body>
 
-<!-- LOGIN WALL -->
-<div id="login-wall">
-  <div id="login-card">
-    <div class="lw-logo">
-      <div class="lw-logo-box">
+<!-- AUTH WALL -->
+<div id="auth-wall">
+  <div id="auth-card">
+    <div class="aw-logo">
+      <div class="aw-logo-box">
         <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22" fill="none" stroke="#C4A882" stroke-width="1.5"/></svg>
       </div>
-      <div class="lw-logo-name">RealtorHunter</div>
+      <div class="aw-logo-name">RealtorHunter</div>
     </div>
-    <div class="lw-title">Member Login</div>
-    <div class="lw-sub">Sign in to access your realtor prospecting dashboard.</div>
-    <div class="lw-error" id="lw-error">Invalid email or password. Please try again.</div>
-    <label class="lw-label">Email Address</label>
-    <input class="lw-input" id="lw-email" type="email" placeholder="you@email.com">
-    <label class="lw-label">Password</label>
-    <input class="lw-input" id="lw-password" type="password" placeholder="Your password">
-    <button class="lw-btn" id="lw-signin-btn">Sign In →</button>
-    <div class="lw-loading" id="lw-loading">Signing in...</div>
-    <div class="lw-divider"></div>
-    <div class="lw-signup">Not a member yet? <a href="https://buy.stripe.com/dRm3cu1Dv1y79Qs8tg6EU00" target="_blank">Subscribe for $79/month →</a></div>
+    <div class="aw-tagline">Find top-producing realtors. Build referral partnerships.</div>
+
+    <!-- TABS -->
+    <div class="aw-tabs">
+      <button class="aw-tab on" id="tab-login" onclick="switchTab('login')">Sign In</button>
+      <button class="aw-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+    </div>
+
+    <!-- ERROR -->
+    <div class="aw-error" id="aw-error"></div>
+    <div class="aw-success" id="aw-success"></div>
+
+    <!-- LOGIN FORM -->
+    <div id="form-login">
+      <label class="aw-label">Email Address</label>
+      <input class="aw-input" id="login-email" type="email" placeholder="you@email.com">
+      <label class="aw-label">Password</label>
+      <input class="aw-input" id="login-password" type="password" placeholder="Your password">
+      <button class="aw-btn" id="login-btn">Sign In →</button>
+      <div class="aw-loading" id="login-loading">Signing in...</div>
+      <div class="aw-forgot"><a href="#" onclick="showForgot()">Forgot password?</a></div>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div id="form-signup" style="display:none">
+      <div class="aw-plan-box">
+        <div class="aw-plan-title">RealtorHunter Monthly</div>
+        <div class="aw-plan-price">$79<span>/month</span></div>
+        <div class="aw-plan-features">
+          <div class="aw-feat">✓ Real top-producing realtors from Realtor.com</div>
+          <div class="aw-feat">✓ Phone numbers, emails & volume data</div>
+          <div class="aw-feat">✓ Personalized call, text & email scripts</div>
+          <div class="aw-feat">✓ Relationship tracking & notes</div>
+          <div class="aw-feat">✓ Cancel anytime</div>
+        </div>
+      </div>
+      <label class="aw-label">Email Address</label>
+      <input class="aw-input" id="signup-email" type="email" placeholder="you@email.com">
+      <label class="aw-label">Create Password</label>
+      <input class="aw-input" id="signup-password" type="password" placeholder="Min 6 characters">
+      <label class="aw-label">Confirm Password</label>
+      <input class="aw-input" id="signup-confirm" type="password" placeholder="Repeat password">
+      <button class="aw-btn" id="signup-btn">Continue to Payment →</button>
+      <div class="aw-loading" id="signup-loading">Creating your account...</div>
+      <div class="aw-secure">🔒 Secured by Stripe. Cancel anytime.</div>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <div id="form-forgot" style="display:none">
+      <div class="aw-back"><a href="#" onclick="switchTab('login')">← Back to Sign In</a></div>
+      <div class="aw-label" style="font-size:13px;color:#5C4033;margin-bottom:1rem;text-align:left;text-transform:none;letter-spacing:0">Enter your email and we'll send a reset link.</div>
+      <label class="aw-label">Email Address</label>
+      <input class="aw-input" id="forgot-email" type="email" placeholder="you@email.com">
+      <button class="aw-btn" id="forgot-btn">Send Reset Link →</button>
+      <div class="aw-loading" id="forgot-loading">Sending...</div>
+    </div>
+
   </div>
 </div>
 
@@ -700,152 +757,243 @@ function saveNote(id){
 // Init filters
 buildFilters();
 
-// ─── CUSTOM AUTH ──────────────────────────────────────────
-// Members: email -> hashed password stored in localStorage by admin
-// Session token stored on login, cleared on logout
+// ─── SUPABASE CONFIG ──────────────────────────────────────
+const SUPA_URL = 'https://tdtmmiuofgslgdmlcarp.supabase.co';
+const SUPA_KEY = 'sb_publishable_QUmPzf0qMBzM_5gSFDrOww_l6ULsknS';
+const STRIPE_LINK = 'https://buy.stripe.com/dRm3cu1Dv1y79Qs8tg6EU00';
 
-// Simple hash function (not crypto but fine for this use case)
-async function hashPass(str) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+// Supabase REST helper
+async function supaFetch(path, opts = {}) {
+  const res = await fetch(SUPA_URL + path, {
+    ...opts,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPA_KEY,
+      'Authorization': 'Bearer ' + (getToken() || SUPA_KEY),
+      ...(opts.headers || {})
+    }
+  });
+  return res;
 }
 
-// Default master password (you can add members via the admin panel below)
-// Members stored as: rh_members = { "email": "hashedpassword", ... }
-function getMembers() {
-  try {
-    const raw = localStorage.getItem('rh_members');
-    return raw ? JSON.parse(raw) : {};
-  } catch(e) { return {}; }
+// Supabase Auth helper
+async function supaAuth(endpoint, body) {
+  const res = await fetch(SUPA_URL + '/auth/v1/' + endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPA_KEY
+    },
+    body: JSON.stringify(body)
+  });
+  return res.json();
 }
 
-function saveMembers(members) {
-  try { localStorage.setItem('rh_members', JSON.stringify(members)); } catch(e) {}
-}
-
-// Session management
-function getSession() {
-  try {
-    const raw = localStorage.getItem('rh_session');
-    if (!raw) return null;
-    const s = JSON.parse(raw);
-    // Session expires after 30 days
-    if (Date.now() - s.ts > 30 * 24 * 3600000) { localStorage.removeItem('rh_session'); return null; }
-    return s;
+// Token management
+function getToken() {
+  try { 
+    const s = localStorage.getItem('rh_supa_session');
+    if (!s) return null;
+    const parsed = JSON.parse(s);
+    if (parsed.expires_at && Date.now() / 1000 > parsed.expires_at) {
+      localStorage.removeItem('rh_supa_session');
+      return null;
+    }
+    return parsed.access_token;
   } catch(e) { return null; }
 }
 
-function saveSession(email) {
-  try { localStorage.setItem('rh_session', JSON.stringify({ email, ts: Date.now() })); } catch(e) {}
+function saveToken(session) {
+  try { localStorage.setItem('rh_supa_session', JSON.stringify(session)); } catch(e) {}
 }
 
-function clearSession() {
-  try { localStorage.removeItem('rh_session'); } catch(e) {}
+function clearToken() {
+  try { localStorage.removeItem('rh_supa_session'); } catch(e) {}
 }
 
-// Check existing session on load
-(function checkSession() {
-  const session = getSession();
-  if (session) {
-    document.getElementById('login-wall').style.display = 'none';
-    try {
-      const s = localStorage.getItem('rh_profile2');
-      if (s) { profile = JSON.parse(s); showApp(); }
-      else { document.getElementById('ob-overlay').style.display = 'flex'; }
-    } catch(e) { document.getElementById('ob-overlay').style.display = 'flex'; }
+function getUserEmail() {
+  try {
+    const s = localStorage.getItem('rh_supa_session');
+    return s ? JSON.parse(s).user?.email : null;
+  } catch(e) { return null; }
+}
+
+// ─── AUTH WALL FUNCTIONS ──────────────────────────────────
+function showErr(msg) {
+  const el = document.getElementById('aw-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+  document.getElementById('aw-success').style.display = 'none';
+}
+
+function showSucc(msg) {
+  const el = document.getElementById('aw-success');
+  el.textContent = msg;
+  el.style.display = 'block';
+  document.getElementById('aw-error').style.display = 'none';
+}
+
+function clearMsgs() {
+  document.getElementById('aw-error').style.display = 'none';
+  document.getElementById('aw-success').style.display = 'none';
+}
+
+function switchTab(tab) {
+  clearMsgs();
+  document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('form-signup').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('form-forgot').style.display = 'none';
+  document.getElementById('tab-login').classList.toggle('on', tab === 'login');
+  document.getElementById('tab-signup').classList.toggle('on', tab === 'signup');
+}
+
+function showForgot() {
+  clearMsgs();
+  document.getElementById('form-login').style.display = 'none';
+  document.getElementById('form-signup').style.display = 'none';
+  document.getElementById('form-forgot').style.display = 'block';
+  document.getElementById('tab-login').classList.remove('on');
+  document.getElementById('tab-signup').classList.remove('on');
+}
+
+function enterApp() {
+  document.getElementById('auth-wall').style.display = 'none';
+  try {
+    const s = localStorage.getItem('rh_profile2');
+    if (s) { profile = JSON.parse(s); showApp(); }
+    else { document.getElementById('ob-overlay').style.display = 'flex'; }
+  } catch(e) { document.getElementById('ob-overlay').style.display = 'flex'; }
+}
+
+// ─── CHECK SESSION ON LOAD ────────────────────────────────
+(function() {
+  const token = getToken();
+  if (token) {
+    enterApp();
   } else {
-    document.getElementById('login-wall').style.display = 'flex';
+    document.getElementById('auth-wall').style.display = 'flex';
     document.getElementById('ob-overlay').style.display = 'none';
     document.getElementById('app').style.display = 'none';
   }
 })();
 
-// Sign in button
-document.getElementById('lw-signin-btn').addEventListener('click', async function() {
-  const email = document.getElementById('lw-email').value.trim().toLowerCase();
-  const password = document.getElementById('lw-password').value;
-  const errEl = document.getElementById('lw-error');
-  const loadEl = document.getElementById('lw-loading');
-  const btn = document.getElementById('lw-signin-btn');
+// ─── SIGN IN ──────────────────────────────────────────────
+document.getElementById('login-btn').addEventListener('click', async function() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const btn = this;
+  clearMsgs();
 
-  errEl.style.display = 'none';
-  if (!email || !password) {
-    errEl.textContent = 'Please enter your email and password.';
-    errEl.style.display = 'block';
-    return;
-  }
+  if (!email || !password) { showErr('Please enter your email and password.'); return; }
 
   btn.disabled = true;
-  loadEl.style.display = 'block';
-  loadEl.textContent = 'Signing in...';
+  document.getElementById('login-loading').style.display = 'block';
 
   try {
-    const hashed = await hashPass(password);
-    const members = getMembers();
-
-    if (members[email] && members[email] === hashed) {
-      saveSession(email);
-      document.getElementById('login-wall').style.display = 'none';
-      try {
-        const s = localStorage.getItem('rh_profile2');
-        if (s) { profile = JSON.parse(s); showApp(); }
-        else { document.getElementById('ob-overlay').style.display = 'flex'; }
-      } catch(e) { document.getElementById('ob-overlay').style.display = 'flex'; }
+    const data = await supaAuth('token?grant_type=password', { email, password });
+    if (data.access_token) {
+      saveToken(data);
+      enterApp();
     } else {
-      errEl.textContent = 'Invalid email or password. Please try again.';
-      errEl.style.display = 'block';
+      const msg = data.error_description || data.msg || '';
+      if (msg.toLowerCase().includes('email not confirmed')) {
+        showErr('Please check your email and click the confirmation link first.');
+      } else if (msg.toLowerCase().includes('invalid login')) {
+        showErr('Invalid email or password. Please try again.');
+      } else {
+        showErr('Invalid email or password. Please try again.');
+      }
     }
   } catch(e) {
-    errEl.textContent = 'Something went wrong. Please try again.';
-    errEl.style.display = 'block';
+    showErr('Connection error. Please try again.');
   }
 
   btn.disabled = false;
-  loadEl.style.display = 'none';
+  document.getElementById('login-loading').style.display = 'none';
 });
 
-// Enter key on password field
-document.getElementById('lw-password').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') document.getElementById('lw-signin-btn').click();
+// ─── SIGN UP ──────────────────────────────────────────────
+document.getElementById('signup-btn').addEventListener('click', async function() {
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const confirm = document.getElementById('signup-confirm').value;
+  const btn = this;
+  clearMsgs();
+
+  if (!email || !password || !confirm) { showErr('Please fill in all fields.'); return; }
+  if (password.length < 6) { showErr('Password must be at least 6 characters.'); return; }
+  if (password !== confirm) { showErr('Passwords do not match.'); return; }
+
+  btn.disabled = true;
+  document.getElementById('signup-loading').style.display = 'block';
+  document.getElementById('signup-loading').textContent = 'Creating your account...';
+
+  try {
+    const data = await supaAuth('signup', { email, password });
+
+    if (data.id || data.user?.id) {
+      // Account created — now send to Stripe with email prefilled
+      const stripeUrl = STRIPE_LINK + '?prefilled_email=' + encodeURIComponent(email);
+      showSucc('✅ Account created! Redirecting to payment...');
+      document.getElementById('signup-loading').textContent = 'Redirecting to Stripe...';
+      setTimeout(() => { window.location.href = stripeUrl; }, 1500);
+    } else if (data.code === 'user_already_exists' || (data.msg && data.msg.includes('already'))) {
+      showErr('An account with this email already exists. Please sign in.');
+      setTimeout(() => switchTab('login'), 2000);
+    } else {
+      showErr(data.error_description || data.msg || 'Could not create account. Please try again.');
+    }
+  } catch(e) {
+    showErr('Connection error. Please try again.');
+  }
+
+  btn.disabled = false;
+  document.getElementById('signup-loading').style.display = 'none';
 });
 
-// Add logout button to header
+// ─── FORGOT PASSWORD ──────────────────────────────────────
+document.getElementById('forgot-btn').addEventListener('click', async function() {
+  const email = document.getElementById('forgot-email').value.trim();
+  const btn = this;
+  clearMsgs();
+
+  if (!email) { showErr('Please enter your email address.'); return; }
+
+  btn.disabled = true;
+  document.getElementById('forgot-loading').style.display = 'block';
+
+  try {
+    await supaAuth('recover', { email });
+    showSucc('✅ Reset link sent! Check your email.');
+    switchTab('login');
+  } catch(e) {
+    showErr('Could not send reset link. Please try again.');
+  }
+
+  btn.disabled = false;
+  document.getElementById('forgot-loading').style.display = 'none';
+});
+
+// Enter keys
+document.getElementById('login-password').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('login-btn').click(); });
+document.getElementById('signup-confirm').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('signup-btn').click(); });
+document.getElementById('forgot-email').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('forgot-btn').click(); });
+
+// ─── LOGOUT ───────────────────────────────────────────────
 document.getElementById('h-edit-btn').insertAdjacentHTML('afterend',
   '<button class="h-edit" id="logout-btn" style="margin-left:4px">Log Out</button>'
 );
-document.getElementById('logout-btn').addEventListener('click', function() {
-  clearSession();
+document.getElementById('logout-btn').addEventListener('click', async function() {
+  try { await supaAuth('logout', {}); } catch(e) {}
+  clearToken();
   document.getElementById('app').style.display = 'none';
   document.getElementById('ob-overlay').style.display = 'none';
-  document.getElementById('login-wall').style.display = 'flex';
-  document.getElementById('lw-email').value = '';
-  document.getElementById('lw-password').value = '';
+  document.getElementById('auth-wall').style.display = 'flex';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-password').value = '';
+  switchTab('login');
 });
 
-// ─── ADMIN: Add Member Function ────────────────────────────
-// Call addMember("email", "password") in browser console to add users
-window.addMember = async function(email, password) {
-  const hashed = await hashPass(password);
-  const members = getMembers();
-  members[email.toLowerCase().trim()] = hashed;
-  saveMembers(members);
-  console.log('✅ Member added:', email);
-  return 'Member added: ' + email;
-};
-
-window.removeMember = function(email) {
-  const members = getMembers();
-  delete members[email.toLowerCase().trim()];
-  saveMembers(members);
-  console.log('✅ Member removed:', email);
-  return 'Member removed: ' + email;
-};
-
-window.listMembers = function() {
-  const members = getMembers();
-  console.log('Members:', Object.keys(members));
-  return Object.keys(members);
-};
 
 </script>
 </body>
