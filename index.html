@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RealtorHunter</title>
-<script data-memberstack-app="app_cmmo0mrdg00sb0spof5u66d6x" data-memberstack-mode="live" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -701,89 +700,103 @@ function saveNote(id){
 // Init filters
 buildFilters();
 
-// ─── MEMBERSTACK AUTH ─────────────────────────────────────
-const MS_KEY = 'pk_3715849099a462f29b1e';
-let ms = null;
+// ─── CUSTOM AUTH ──────────────────────────────────────────
+// Members: email -> hashed password stored in localStorage by admin
+// Session token stored on login, cleared on logout
 
-// Init Memberstack DOM
-function initMS(){
-  try{
-    if(window.$memberstackDom){
-      ms = window.$memberstackDom;
-      checkSession();
-    } else {
-      setTimeout(initMS, 200);
-    }
-  } catch(e){ 
-    document.getElementById('login-wall').style.display = 'flex';
-  }
+// Simple hash function (not crypto but fine for this use case)
+async function hashPass(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
-async function checkSession(){
-  try{
-    const member = await ms.getCurrentMember();
-    if(member && member.data){
-      document.getElementById('login-wall').style.display = 'none';
-      try{
-        const s = localStorage.getItem('rh_profile2');
-        if(s){ profile = JSON.parse(s); showApp(); }
-        else { document.getElementById('ob-overlay').style.display = 'flex'; }
-      }catch(e){ document.getElementById('ob-overlay').style.display = 'flex'; }
-    } else {
-      document.getElementById('login-wall').style.display = 'flex';
-    }
-  } catch(e){
-    document.getElementById('login-wall').style.display = 'flex';
-  }
+// Default master password (you can add members via the admin panel below)
+// Members stored as: rh_members = { "email": "hashedpassword", ... }
+function getMembers() {
+  try {
+    const raw = localStorage.getItem('rh_members');
+    return raw ? JSON.parse(raw) : {};
+  } catch(e) { return {}; }
 }
 
+function saveMembers(members) {
+  try { localStorage.setItem('rh_members', JSON.stringify(members)); } catch(e) {}
+}
 
+// Session management
+function getSession() {
+  try {
+    const raw = localStorage.getItem('rh_session');
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    // Session expires after 30 days
+    if (Date.now() - s.ts > 30 * 24 * 3600000) { localStorage.removeItem('rh_session'); return null; }
+    return s;
+  } catch(e) { return null; }
+}
+
+function saveSession(email) {
+  try { localStorage.setItem('rh_session', JSON.stringify({ email, ts: Date.now() })); } catch(e) {}
+}
+
+function clearSession() {
+  try { localStorage.removeItem('rh_session'); } catch(e) {}
+}
+
+// Check existing session on load
+(function checkSession() {
+  const session = getSession();
+  if (session) {
+    document.getElementById('login-wall').style.display = 'none';
+    try {
+      const s = localStorage.getItem('rh_profile2');
+      if (s) { profile = JSON.parse(s); showApp(); }
+      else { document.getElementById('ob-overlay').style.display = 'flex'; }
+    } catch(e) { document.getElementById('ob-overlay').style.display = 'flex'; }
+  } else {
+    document.getElementById('login-wall').style.display = 'flex';
+    document.getElementById('ob-overlay').style.display = 'none';
+    document.getElementById('app').style.display = 'none';
+  }
+})();
 
 // Sign in button
-document.getElementById('lw-signin-btn').addEventListener('click', async function(){
-  const email = document.getElementById('lw-email').value.trim();
+document.getElementById('lw-signin-btn').addEventListener('click', async function() {
+  const email = document.getElementById('lw-email').value.trim().toLowerCase();
   const password = document.getElementById('lw-password').value;
   const errEl = document.getElementById('lw-error');
   const loadEl = document.getElementById('lw-loading');
   const btn = document.getElementById('lw-signin-btn');
 
-  if(!email || !password){
+  errEl.style.display = 'none';
+  if (!email || !password) {
     errEl.textContent = 'Please enter your email and password.';
     errEl.style.display = 'block';
     return;
   }
 
-  errEl.style.display = 'none';
   btn.disabled = true;
   loadEl.style.display = 'block';
+  loadEl.textContent = 'Signing in...';
 
-  try{
-    // If ms not ready yet, wait for it
-    if(!ms){
-      loadEl.textContent = 'Connecting... please wait';
-      loadEl.style.display = 'block';
-      let waited = 0;
-      while(!ms && waited < 5000){
-        await new Promise(r => setTimeout(r, 200));
-        waited += 200;
-      }
-      loadEl.textContent = 'Signing in...';
-    }
-    if(!ms){ errEl.textContent = 'Could not connect. Please refresh the page and try again.'; errEl.style.display='block'; btn.disabled=false; loadEl.style.display='none'; return; }
-    const result = await ms.loginMemberEmailPassword({ email, password });
-    if(result && result.data){
+  try {
+    const hashed = await hashPass(password);
+    const members = getMembers();
+
+    if (members[email] && members[email] === hashed) {
+      saveSession(email);
       document.getElementById('login-wall').style.display = 'none';
-      try{
+      try {
         const s = localStorage.getItem('rh_profile2');
-        if(s){ profile = JSON.parse(s); showApp(); }
+        if (s) { profile = JSON.parse(s); showApp(); }
         else { document.getElementById('ob-overlay').style.display = 'flex'; }
-      }catch(e){ document.getElementById('ob-overlay').style.display = 'flex'; }
+      } catch(e) { document.getElementById('ob-overlay').style.display = 'flex'; }
     } else {
       errEl.textContent = 'Invalid email or password. Please try again.';
       errEl.style.display = 'block';
     }
-  } catch(e){
-    errEl.textContent = e.message || 'Invalid email or password.';
+  } catch(e) {
+    errEl.textContent = 'Something went wrong. Please try again.';
     errEl.style.display = 'block';
   }
 
@@ -792,16 +805,16 @@ document.getElementById('lw-signin-btn').addEventListener('click', async functio
 });
 
 // Enter key on password field
-document.getElementById('lw-password').addEventListener('keydown', function(e){
-  if(e.key === 'Enter') document.getElementById('lw-signin-btn').click();
+document.getElementById('lw-password').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('lw-signin-btn').click();
 });
 
 // Add logout button to header
-document.getElementById('h-edit-btn').insertAdjacentHTML('afterend', 
+document.getElementById('h-edit-btn').insertAdjacentHTML('afterend',
   '<button class="h-edit" id="logout-btn" style="margin-left:4px">Log Out</button>'
 );
-document.getElementById('logout-btn').addEventListener('click', async function(){
-  try{ if(ms) await ms.logout(); }catch(e){}
+document.getElementById('logout-btn').addEventListener('click', function() {
+  clearSession();
   document.getElementById('app').style.display = 'none';
   document.getElementById('ob-overlay').style.display = 'none';
   document.getElementById('login-wall').style.display = 'flex';
@@ -809,13 +822,30 @@ document.getElementById('logout-btn').addEventListener('click', async function()
   document.getElementById('lw-password').value = '';
 });
 
-// Show login wall immediately
-document.getElementById('login-wall').style.display = 'flex';
-document.getElementById('ob-overlay').style.display = 'none';
-document.getElementById('app').style.display = 'none';
+// ─── ADMIN: Add Member Function ────────────────────────────
+// Call addMember("email", "password") in browser console to add users
+window.addMember = async function(email, password) {
+  const hashed = await hashPass(password);
+  const members = getMembers();
+  members[email.toLowerCase().trim()] = hashed;
+  saveMembers(members);
+  console.log('✅ Member added:', email);
+  return 'Member added: ' + email;
+};
 
-// Start Memberstack
-window.addEventListener('load', initMS);
+window.removeMember = function(email) {
+  const members = getMembers();
+  delete members[email.toLowerCase().trim()];
+  saveMembers(members);
+  console.log('✅ Member removed:', email);
+  return 'Member removed: ' + email;
+};
+
+window.listMembers = function() {
+  const members = getMembers();
+  console.log('Members:', Object.keys(members));
+  return Object.keys(members);
+};
 
 </script>
 </body>
