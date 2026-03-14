@@ -142,6 +142,14 @@ body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size
 .ds{margin-bottom:1.25rem}
 .ds-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#9A9590;margin-bottom:8px;font-weight:600}
 .crow{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#F5F3EF;border-radius:8px;margin-bottom:6px;font-size:13px}
+.plat-btn{display:flex;align-items:center;gap:7px;padding:9px 13px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;margin-bottom:6px;font-family:'DM Sans',sans-serif;transition:opacity .2s}
+.plat-btn:hover{opacity:.85}
+.plat-realtor{background:#2C1810;color:#fff}
+.plat-fb{background:#1877F2;color:#fff}
+.plat-ig{background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff}
+.plat-li{background:#0A66C2;color:#fff}
+.plat-tw{background:#1A1A1A;color:#fff}
+.plat-web{background:#F5F3EF;border:1px solid #C4A882;color:#5C4033}
 .stabs{display:flex;border:1px solid #E8E5E0;border-radius:8px;overflow:hidden;margin-bottom:10px}
 .stab{flex:1;padding:7px 6px;font-size:11px;background:#fff;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;color:#9A9590;text-align:center}
 .stab.on{background:#2C1810;color:#fff;font-weight:500}
@@ -215,7 +223,7 @@ body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size
         <div class="aw-plan-price">$79<span>/month</span></div>
         <div class="aw-plan-features">
           <div class="aw-feat">✓ Real top-producing realtors from Realtor.com</div>
-          <div class="aw-feat">✓ Phone numbers, emails & volume data</div>
+          <div class="aw-feat">✓ Phone numbers, platforms & volume data</div>
           <div class="aw-feat">✓ Personalized call, text & email scripts</div>
           <div class="aw-feat">✓ Relationship tracking & notes</div>
           <div class="aw-feat">✓ Cancel anytime</div>
@@ -518,15 +526,24 @@ async function runSearch(){
     realtors = results.map((r, i) => {
       const name = (r.agent_name || r.name || 'Unknown Agent').replace(/,\s*(agent|broker|realtor|associate|pa|llc).*/gi,'').trim();
       const sold = parseInt(r.sold_count) || 0;
+      const agentSlug = r.agent_slug || r.profile_url || '';
+      const realtorProfile = agentSlug
+        ? 'https://www.realtor.com/realestateagents/' + agentSlug
+        : 'https://www.realtor.com/realestateagents/' + name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
       return {
         id: i+1, name,
         brokerage: r.broker_name || r.brokerage || r.office_name || 'Independent',
         phone: r.office_phone || r.phone || '',
         mobile: Array.isArray(r.mobile_phones) ? r.mobile_phones[0] : '',
-        email: r.email || '',
         sold, volume: sold * median, median,
         listings: parseInt(r.listing_count) || 0,
         url: r.website || '',
+        slug: agentSlug,
+        realtorProfile,
+        facebook: r.facebook_url || r.facebook || '',
+        instagram: r.instagram_url || r.instagram || '',
+        linkedin: r.linkedin_url || r.linkedin || '',
+        twitter: r.twitter_url || r.twitter || '',
         areas: Array.isArray(r.areas_serviced) ? r.areas_serviced : [],
         col: color(name), rank: i+1
       };
@@ -612,7 +629,7 @@ function renderList(){
       <div class="ci">
         <div class="cn">${r.name}${badge}</div>
         <div class="cb">${r.brokerage}</div>
-        ${r.email ? `<div class="ce">✉ ${r.email}</div>` : '<div style="font-size:11px;color:#9A9590;margin-top:2px">✉ No email listed</div>'}
+        <div class="ce">🏠 Realtor.com · ${r.sold} sold · ${r.listings} active listings</div>
         <div class="tags">
           <span class="tag t1">${r.sold} sold</span>
           ${r.listings > 0 ? `<span class="tag t2">${r.listings} listings</span>` : ''}
@@ -627,9 +644,7 @@ function renderList(){
         <button class="abtn dark" onclick="event.stopPropagation();copyS(${r.id},'call')" title="Copy Call Script">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.8 19.8 0 01.09 1.24a2 2 0 012-2.18H5a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
         </button>
-        ${r.email ? `<button class="abtn esp" onclick="event.stopPropagation();navigator.clipboard.writeText('${r.email}');toast('Email copied!')" title="Copy Email">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        </button>` : ''}
+
         <button class="abtn" onclick="event.stopPropagation();selectR(${r.id})" title="View Profile">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </button>
@@ -697,21 +712,34 @@ function renderDetail(r){
     </div>
     ${r.areas.length ? `<div class="ds"><div class="ds-title">Areas Served</div><div style="display:flex;gap:6px;flex-wrap:wrap">${r.areas.slice(0,4).map(a=>`<span class="tag t3">${a}</span>`).join('')}</div></div>` : ''}
     <div class="ds">
-      <div class="ds-title">Contact Info</div>
+      <div class="ds-title">Contact & Platforms</div>
       ${r.phone ? `<div class="crow"><span>📞</span><span>${r.phone}</span></div>` : ''}
       ${r.mobile ? `<div class="crow"><span>📱</span><span>${r.mobile}</span></div>` : ''}
-      ${r.email ? `<div class="crow"><span>✉</span><span style="font-size:12px">${r.email}</span></div>` : '<div class="crow" style="color:#9A9590">✉ No email listed</div>'}
+      <a href="${r.realtorProfile}" target="_blank" class="plat-btn plat-realtor">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 2a8 8 0 110 16A8 8 0 0112 4zm-1 4v5l4 2.5-.75-1.3L11 13V8h-1z"/></svg>
+        View Realtor.com Profile ↗
+      </a>
+      ${r.facebook ? `<a href="${r.facebook}" target="_blank" class="plat-btn plat-fb"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>Facebook</a>` : ''}
+      ${r.instagram ? `<a href="${r.instagram}" target="_blank" class="plat-btn plat-ig"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>Instagram</a>` : ''}
+      ${r.linkedin ? `<a href="${r.linkedin}" target="_blank" class="plat-btn plat-li"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>LinkedIn</a>` : ''}
+      ${r.twitter ? `<a href="${r.twitter}" target="_blank" class="plat-btn plat-tw"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/></svg>Twitter / X</a>` : ''}
+      ${r.url ? `<a href="${r.url}" target="_blank" class="plat-btn plat-web"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>Website</a>` : ''}
+      <a href="${`https://www.google.com/search?q=${encodeURIComponent(r.name+' '+r.brokerage+' realtor email contact')}`}" target="_blank" class="plat-btn" style="background:#F5F3EF;border:1px solid #C4A882;color:#5C4033;margin-top:2px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Find Their Email →
+      </a>
     </div>
     <div class="ds">
-      <div class="ds-title">Outreach Scripts</div>
+      <div class="ds-title">Recent Sales & Outreach Scripts</div>
       <div class="stabs">
         <button class="stab${scriptType[r.id]==='call'?' on':''}" onclick="switchS(${r.id},'call',this)">Call</button>
         <button class="stab${scriptType[r.id]==='vm'?' on':''}" onclick="switchS(${r.id},'vm',this)">Voicemail</button>
         <button class="stab${scriptType[r.id]==='text'?' on':''}" onclick="switchS(${r.id},'text',this)">Text</button>
         <button class="stab${scriptType[r.id]==='email'?' on':''}" onclick="switchS(${r.id},'email',this)">Email</button>
+        <button class="stab${scriptType[r.id]==='recent'?' on':''}" onclick="switchS(${r.id},'recent',this)">🏠 Recent Sales</button>
       </div>
-      <div class="sbox" id="sbox-${r.id}">${script(r, scriptType[r.id])}</div>
-      <button class="cbtn" onclick="copyS(${r.id},'current')">Copy Script</button>
+      <div class="sbox" id="sbox-${r.id}" style="${scriptType[r.id]==='recent'?'padding:0;background:transparent;border:none;min-height:auto':''}">${scriptType[r.id]==='recent' ? recentSalesHTML(r) : script(r, scriptType[r.id])}</div>
+      ${scriptType[r.id]!=='recent' ? `<button class="cbtn" onclick="copyS(${r.id},'current')">Copy Script</button>` : ''}
     </div>
     <div class="ds">
       <div class="ds-title">Relationship Status</div>
@@ -728,12 +756,51 @@ function renderDetail(r){
     </div>`;
 }
 
+function recentSalesHTML(r) {
+  const nameSlug = r.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const brokerSlug = r.brokerage.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const soldURL = r.slug
+    ? `https://www.realtor.com/realestateagents/${r.slug}`
+    : `https://www.realtor.com/realestateagents/${nameSlug}_${brokerSlug}`;
+  const googleURL = `https://www.google.com/search?q=${encodeURIComponent(r.name+' '+r.brokerage+' recently sold listings')}`;
+  const zillowURL = `https://www.zillow.com/agent-profile/search/?q=${encodeURIComponent(r.name)}`;
+
+  return `<div style="display:flex;flex-direction:column;gap:8px;padding:4px 0">
+    <div style="background:#F5F3EF;border-radius:8px;padding:12px;font-size:12px;color:#5C4033;line-height:1.7">
+      <strong>🏠 ${r.sold} properties sold</strong> by ${r.name.split(' ')[0]}.<br>
+      Click below to see their recent sold listings on Realtor.com — great intel before you call!
+    </div>
+    <a href="${soldURL}" target="_blank" style="display:flex;align-items:center;gap:8px;background:#2C1810;color:#fff;border-radius:8px;padding:10px 14px;text-decoration:none;font-size:13px;font-weight:600;">
+      <span>🏠</span> View Recent Sales on Realtor.com ↗
+    </a>
+    <a href="${googleURL}" target="_blank" style="display:flex;align-items:center;gap:8px;background:#F5F3EF;border:1px solid #C4A882;color:#5C4033;border-radius:8px;padding:10px 14px;text-decoration:none;font-size:13px;font-weight:600;">
+      <span>🔍</span> Google: "${r.name.split(' ')[0]}'s Recent Sales" ↗
+    </a>
+    <a href="${zillowURL}" target="_blank" style="display:flex;align-items:center;gap:8px;background:#F5F3EF;border:1px solid #C4A882;color:#5C4033;border-radius:8px;padding:10px 14px;text-decoration:none;font-size:13px;font-weight:600;">
+      <span>🏡</span> Search on Zillow ↗
+    </a>
+    <div style="font-size:11px;color:#9A9590;margin-top:4px;text-align:center">
+      Use their recent sales to personalize your outreach — mention their last neighborhood!
+    </div>
+  </div>`;
+}
+
 function switchS(id, type, btn){
   const r = realtors.find(x=>x.id===id);
   document.querySelectorAll('.stab').forEach(t=>t.classList.remove('on'));
   btn.classList.add('on');
   scriptType[id] = type;
-  document.getElementById('sbox-'+id).textContent = script(r, type);
+  const sbox = document.getElementById('sbox-'+id);
+  const copyBtn = sbox.nextElementSibling;
+  if(type === 'recent'){
+    sbox.innerHTML = recentSalesHTML(r);
+    sbox.style.cssText = 'padding:0;background:transparent;border:none;min-height:auto';
+    if(copyBtn && copyBtn.classList.contains('cbtn')) copyBtn.style.display='none';
+  } else {
+    sbox.textContent = script(r, type);
+    sbox.style.cssText = '';
+    if(copyBtn && copyBtn.classList.contains('cbtn')) copyBtn.style.display='';
+  }
 }
 
 function copyS(id, typeArg){
