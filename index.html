@@ -118,6 +118,10 @@ body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size
 .t1{background:#F0EBE3;color:#5C4033}
 .t2{background:#EBF0E3;color:#3B6D11}
 .t3{background:#E3EBF0;color:#185FA5}
+.loy-hot{background:#E8F5E9;color:#1B5E20;border:1px solid #A5D6A7}
+.loy-warm{background:#FFF8E1;color:#7A5F00;border:1px solid #FFE082}
+.loy-cold{background:#FFEBEE;color:#B71C1C;border:1px solid #FFCDD2}
+.loyalty-badge{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600;display:inline-flex;align-items:center;gap:3px}
 .cs{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
 .cv{font-family:'Playfair Display',serif;font-size:15px;color:#5C4033;font-weight:500}
 .cd{font-size:11px;color:#9A9590}
@@ -608,6 +612,43 @@ function applyFilter(){
   renderList();
 }
 
+// ─── LOYALTY SCORE ────────────────────────────────────
+function getLoyalty(r) {
+  const sold = r.sold || 0;
+  const listings = r.listings || 0;
+  const yrs = r.areas && r.areas.length > 2 ? 3 : r.areas && r.areas.length > 0 ? 2 : 1;
+
+  // High volume agents (50+ sold) likely have established LO relationships
+  // Very high listing:sold ratio = buyer side heavy = more flexible with LOs
+  // Lower sold count = newer or slower = more open to new LO partnerships
+
+  if (sold >= 50) {
+    return {
+      label: 'Likely Has Preferred LO',
+      tip: 'High producer — likely has an established lender. Come with a strong value prop.',
+      cls: 'loy-cold',
+      icon: '⚠️',
+      priority: 3
+    };
+  } else if (sold >= 20) {
+    return {
+      label: 'May Have Preferred LO',
+      tip: 'Solid producer — may have existing lender relationships but worth pursuing.',
+      cls: 'loy-warm',
+      icon: '🟡',
+      priority: 2
+    };
+  } else {
+    return {
+      label: 'Great Target',
+      tip: 'Growing agent — likely open to building new lender partnerships. High priority!',
+      cls: 'loy-hot',
+      icon: '🎯',
+      priority: 1
+    };
+  }
+}
+
 // ─── LIST ─────────────────────────────────────────────────
 function renderList(){
   const panel = document.getElementById('list-panel');
@@ -634,6 +675,7 @@ function renderList(){
           <span class="tag t1">${r.sold} sold</span>
           ${r.listings > 0 ? `<span class="tag t2">${r.listings} listings</span>` : ''}
           ${r.areas[0] ? `<span class="tag t3">${r.areas[0]}</span>` : ''}
+          <span class="tag loyalty-badge ${getLoyalty(r).cls}">${getLoyalty(r).icon} ${getLoyalty(r).label}</span>
         </div>
       </div>
       <div class="cs">
@@ -711,6 +753,16 @@ function renderDetail(r){
       <div class="mc"><div class="mv">${fmt(r.median)}</div><div class="ml">Area Median Price</div></div>
     </div>
     ${r.areas.length ? `<div class="ds"><div class="ds-title">Areas Served</div><div style="display:flex;gap:6px;flex-wrap:wrap">${r.areas.slice(0,4).map(a=>`<span class="tag t3">${a}</span>`).join('')}</div></div>` : ''}
+    <div class="ds">
+      <div class="ds-title">Lender Loyalty Estimate</div>
+      <div style="background:#F5F3EF;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="tag loyalty-badge ${getLoyalty(r).cls}" style="font-size:11px;padding:4px 10px">${getLoyalty(r).icon} ${getLoyalty(r).label}</span>
+        </div>
+        <div style="font-size:12px;color:#5C4033;line-height:1.6">${getLoyalty(r).tip}</div>
+        <div style="font-size:10px;color:#9A9590;margin-top:2px">⚡ Est. based on production volume · Not official lender data</div>
+      </div>
+    </div>
     <div class="ds">
       <div class="ds-title">Contact & Platforms</div>
       ${r.phone ? `<div class="crow"><span>📞</span><span>${r.phone}</span></div>` : ''}
