@@ -476,9 +476,44 @@ document.getElementById('h-edit-btn').addEventListener('click', function(){
 document.getElementById('search-btn').addEventListener('click', runSearch);
 document.getElementById('area-input').addEventListener('keydown', function(e){ if(e.key==='Enter') runSearch(); });
 
+// ─── CITY FORMATTER ───────────────────────────────────
+const CITY_STATE = {
+  'oviedo':'Oviedo, FL','orlando':'Orlando, FL','miami':'Miami, FL','tampa':'Tampa, FL',
+  'jacksonville':'Jacksonville, FL','st pete':'St. Petersburg, FL','saint pete':'St. Petersburg, FL',
+  'st. pete':'St. Petersburg, FL','st petersburg':'St. Petersburg, FL','naples':'Naples, FL',
+  'fort lauderdale':'Fort Lauderdale, FL','boca raton':'Boca Raton, FL','sarasota':'Sarasota, FL',
+  'clearwater':'Clearwater, FL','gainesville':'Gainesville, FL','tallahassee':'Tallahassee, FL',
+  'pensacola':'Pensacola, FL','daytona':'Daytona Beach, FL','daytona beach':'Daytona Beach, FL',
+  'kissimmee':'Kissimmee, FL','winter park':'Winter Park, FL','lake mary':'Lake Mary, FL',
+  'sanford':'Sanford, FL','deltona':'Deltona, FL','altamonte':'Altamonte Springs, FL',
+  'altamonte springs':'Altamonte Springs, FL','longwood':'Longwood, FL','apopka':'Apopka, FL',
+  'new york':'New York, NY','los angeles':'Los Angeles, CA','chicago':'Chicago, IL',
+  'houston':'Houston, TX','phoenix':'Phoenix, AZ','dallas':'Dallas, TX',
+  'san antonio':'San Antonio, TX','austin':'Austin, TX','charlotte':'Charlotte, NC',
+  'atlanta':'Atlanta, GA','denver':'Denver, CO','seattle':'Seattle, WA','boston':'Boston, MA',
+  'nashville':'Nashville, TN','las vegas':'Las Vegas, NV','portland':'Portland, OR',
+  'san diego':'San Diego, CA','san francisco':'San Francisco, CA','san jose':'San Jose, CA',
+  'raleigh':'Raleigh, NC','richmond':'Richmond, VA','virginia beach':'Virginia Beach, VA',
+  'columbus':'Columbus, OH','cleveland':'Cleveland, OH','cincinnati':'Cincinnati, OH',
+  'minneapolis':'Minneapolis, MN','st louis':'St. Louis, MO','kansas city':'Kansas City, MO',
+  'memphis':'Memphis, TN','louisville':'Louisville, KY','new orleans':'New Orleans, LA',
+  'salt lake city':'Salt Lake City, UT','tucson':'Tucson, AZ','albuquerque':'Albuquerque, NM',
+};
+
+function formatArea(raw) {
+  const trimmed = raw.trim();
+  if (/^\d{5}$/.test(trimmed)) return trimmed;
+  if (/,\s*[A-Z]{2}$/.test(trimmed)) return trimmed;
+  const lower = trimmed.toLowerCase();
+  if (CITY_STATE[lower]) return CITY_STATE[lower];
+  return trimmed;
+}
+
 async function runSearch(){
-  const area = document.getElementById('area-input').value.trim();
-  if(!area){ toast('Please enter a ZIP code or city'); return; }
+  const rawArea = document.getElementById('area-input').value.trim();
+  if(!rawArea){ toast('Please enter a ZIP code or city'); return; }
+  const area = formatArea(rawArea);
+  if(area !== rawArea) document.getElementById('area-input').value = area;
 
   const btn = document.getElementById('search-btn');
   btn.disabled = true; btn.textContent = 'Searching...';
