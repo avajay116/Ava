@@ -476,36 +476,53 @@ document.getElementById('h-edit-btn').addEventListener('click', function(){
 document.getElementById('search-btn').addEventListener('click', runSearch);
 document.getElementById('area-input').addEventListener('keydown', function(e){ if(e.key==='Enter') runSearch(); });
 
-// ─── CITY FORMATTER ───────────────────────────────────
-const CITY_STATE = {
-  'oviedo':'Oviedo, FL','orlando':'Orlando, FL','miami':'Miami, FL','tampa':'Tampa, FL',
-  'jacksonville':'Jacksonville, FL','st pete':'St. Petersburg, FL','saint pete':'St. Petersburg, FL',
-  'st. pete':'St. Petersburg, FL','st petersburg':'St. Petersburg, FL','naples':'Naples, FL',
-  'fort lauderdale':'Fort Lauderdale, FL','boca raton':'Boca Raton, FL','sarasota':'Sarasota, FL',
-  'clearwater':'Clearwater, FL','gainesville':'Gainesville, FL','tallahassee':'Tallahassee, FL',
-  'pensacola':'Pensacola, FL','daytona':'Daytona Beach, FL','daytona beach':'Daytona Beach, FL',
-  'kissimmee':'Kissimmee, FL','winter park':'Winter Park, FL','lake mary':'Lake Mary, FL',
-  'sanford':'Sanford, FL','deltona':'Deltona, FL','altamonte':'Altamonte Springs, FL',
-  'altamonte springs':'Altamonte Springs, FL','longwood':'Longwood, FL','apopka':'Apopka, FL',
-  'new york':'New York, NY','los angeles':'Los Angeles, CA','chicago':'Chicago, IL',
-  'houston':'Houston, TX','phoenix':'Phoenix, AZ','dallas':'Dallas, TX',
-  'san antonio':'San Antonio, TX','austin':'Austin, TX','charlotte':'Charlotte, NC',
-  'atlanta':'Atlanta, GA','denver':'Denver, CO','seattle':'Seattle, WA','boston':'Boston, MA',
-  'nashville':'Nashville, TN','las vegas':'Las Vegas, NV','portland':'Portland, OR',
-  'san diego':'San Diego, CA','san francisco':'San Francisco, CA','san jose':'San Jose, CA',
-  'raleigh':'Raleigh, NC','richmond':'Richmond, VA','virginia beach':'Virginia Beach, VA',
-  'columbus':'Columbus, OH','cleveland':'Cleveland, OH','cincinnati':'Cincinnati, OH',
-  'minneapolis':'Minneapolis, MN','st louis':'St. Louis, MO','kansas city':'Kansas City, MO',
-  'memphis':'Memphis, TN','louisville':'Louisville, KY','new orleans':'New Orleans, LA',
-  'salt lake city':'Salt Lake City, UT','tucson':'Tucson, AZ','albuquerque':'Albuquerque, NM',
+// ─── CITY TO ZIP ──────────────────────────────────────
+const CITY_ZIP = {
+  'oviedo':'32765','orlando':'32801','miami':'33101','tampa':'33601',
+  'jacksonville':'32201','st pete':'33701','saint pete':'33701','st. pete':'33701',
+  'st petersburg':'33701','naples':'34101','fort lauderdale':'33301',
+  'boca raton':'33431','sarasota':'34230','clearwater':'33755',
+  'gainesville':'32601','tallahassee':'32301','pensacola':'32501',
+  'daytona':'32114','daytona beach':'32114','kissimmee':'34741',
+  'winter park':'32789','lake mary':'32746','sanford':'32771',
+  'deltona':'32725','altamonte springs':'32701','altamonte':'32701',
+  'longwood':'32750','apopka':'32703','celebration':'34747',
+  'clermont':'34711','ocala':'34470','fort myers':'33901',
+  'cape coral':'33904','west palm beach':'33401','palm beach gardens':'33410',
+  'jupiter':'33458','port st lucie':'34952','vero beach':'32960',
+  'melbourne':'32901','cocoa beach':'32931','titusville':'32780',
+  'palm bay':'32907','new smyrna beach':'32168','deland':'32720',
+  'leesburg':'34748','spring hill':'34608','new port richey':'34652',
+  'tarpon springs':'34689','dunedin':'34698','brandon':'33510',
+  'riverview':'33578','bradenton':'34201','venice':'34285',
+  'new york':'10001','los angeles':'90001','chicago':'60601',
+  'houston':'77001','phoenix':'85001','dallas':'75201',
+  'san antonio':'78201','austin':'78701','charlotte':'28201',
+  'atlanta':'30301','denver':'80201','seattle':'98101',
+  'boston':'02101','nashville':'37201','las vegas':'89101',
+  'portland':'97201','san diego':'92101','san francisco':'94101',
+  'san jose':'95101','raleigh':'27601','richmond':'23219',
+  'virginia beach':'23451','columbus':'43085','cleveland':'44101',
+  'cincinnati':'45202','minneapolis':'55401','st louis':'63101',
+  'kansas city':'64101','memphis':'38101','louisville':'40202',
+  'new orleans':'70112','salt lake city':'84101','tucson':'85701',
+  'albuquerque':'87101','philadelphia':'19101','detroit':'48201',
+  'baltimore':'21201','milwaukee':'53202','indianapolis':'46201',
+  'jacksonville fl':'32201','miami fl':'33101','tampa fl':'33601',
+  'orlando fl':'32801','fort lauderdale fl':'33301',
 };
 
 function formatArea(raw) {
   const trimmed = raw.trim();
-  if (/^\d{5}$/.test(trimmed)) return trimmed;
-  if (/,\s*[A-Z]{2}$/.test(trimmed)) return trimmed;
-  const lower = trimmed.toLowerCase();
-  if (CITY_STATE[lower]) return CITY_STATE[lower];
+  // Already a ZIP code — use as-is
+  if (/^[0-9]{5}$/.test(trimmed)) return trimmed;
+  // Check city lookup — return ZIP
+  const lower = trimmed.toLowerCase().replace(/\s*,\s*(fl|florida|tx|texas|ca|california|ny|new york|ga|georgia|nc|north carolina|va|virginia|oh|ohio|tn|tennessee|mn|minnesota|mo|missouri|la|louisiana|ut|utah|az|arizona|nm|new mexico|pa|pennsylvania|mi|michigan|md|maryland|wi|wisconsin|in|indiana)\s*$/i, '').trim();
+  if (CITY_ZIP[lower]) return CITY_ZIP[lower];
+  // Try with state suffix removed
+  const noState = trimmed.replace(/,?\s*[A-Z]{2}$/i, '').trim().toLowerCase();
+  if (CITY_ZIP[noState]) return CITY_ZIP[noState];
+  // Fallback — return original
   return trimmed;
 }
 
