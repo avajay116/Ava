@@ -118,10 +118,6 @@ body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size
 .t1{background:#F0EBE3;color:#5C4033}
 .t2{background:#EBF0E3;color:#3B6D11}
 .t3{background:#E3EBF0;color:#185FA5}
-.loy-hot{background:#E8F5E9;color:#1B5E20;border:1px solid #A5D6A7}
-.loy-warm{background:#FFF8E1;color:#7A5F00;border:1px solid #FFE082}
-.loy-cold{background:#FFEBEE;color:#B71C1C;border:1px solid #FFCDD2}
-.loyalty-badge{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600;display:inline-flex;align-items:center;gap:3px}
 .cs{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
 .cv{font-family:'Playfair Display',serif;font-size:15px;color:#5C4033;font-weight:500}
 .cd{font-size:11px;color:#9A9590}
@@ -169,6 +165,17 @@ body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size
 .sc.pt.on{background:#F5EDE0;border-color:#5C4033;color:#5C4033;font-weight:500}
 .note-box{width:100%;background:#F5F3EF;border:1px solid #E8E5E0;border-radius:8px;padding:10px 12px;font-size:12px;font-family:'DM Sans',sans-serif;color:#1A1A1A;resize:vertical;min-height:70px;outline:none}
 .note-save{background:#C4A882;color:#2C1810;border:none;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;margin-top:6px;font-family:'DM Sans',sans-serif}
+
+/* AI IMPROVER */
+.ai-improver{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.ai-improver-row{display:flex;gap:6px}
+.ai-input{flex:1;background:#F5F3EF;border:1px solid #E8E5E0;border-radius:8px;padding:8px 11px;font-size:12px;font-family:'DM Sans',sans-serif;color:#1A1A1A;outline:none}
+.ai-input:focus{border-color:#C4A882}
+.ai-input::placeholder{color:#9A9590}
+.ai-go-btn{background:#C4A882;color:#2C1810;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0}
+.ai-go-btn:hover{background:#D4A853}
+.ai-go-btn:disabled{opacity:.6;cursor:not-allowed}
+.ai-status{font-size:11px;color:#8B6F47;display:none;font-style:italic}
 
 /* MISC */
 .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#2C1810;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transform:translateY(8px);transition:all .3s;z-index:9999;pointer-events:none;border-left:3px solid #C4A882}
@@ -371,7 +378,7 @@ const ACTOR = 'api-empire~realtor-com-agents-by-zip-code-scraper';
 const COLORS = ['#5C4033','#8B6F47','#3B5068','#2E5E4A','#614B32','#3D4F68','#5E3A2E','#4A6040'];
 const PER_PAGE = 10;
 const CACHE_PREFIX = 'rh2_';
-const CACHE_HOURS = 168;
+const CACHE_HOURS = 24;
 
 // ─── STATE ────────────────────────────────────────────────
 let profile = {fname:'', company:'', title:'Loan Officer'};
@@ -476,61 +483,9 @@ document.getElementById('h-edit-btn').addEventListener('click', function(){
 document.getElementById('search-btn').addEventListener('click', runSearch);
 document.getElementById('area-input').addEventListener('keydown', function(e){ if(e.key==='Enter') runSearch(); });
 
-// ─── CITY TO ZIP ──────────────────────────────────────
-const CITY_ZIP = {
-  'oviedo':'32765','orlando':'32801','miami':'33101','tampa':'33601',
-  'jacksonville':'32201','st pete':'33701','saint pete':'33701','st. pete':'33701',
-  'st petersburg':'33701','naples':'34101','fort lauderdale':'33301',
-  'boca raton':'33431','sarasota':'34230','clearwater':'33755',
-  'gainesville':'32601','tallahassee':'32301','pensacola':'32501',
-  'daytona':'32114','daytona beach':'32114','kissimmee':'34741',
-  'winter park':'32789','lake mary':'32746','sanford':'32771',
-  'deltona':'32725','altamonte springs':'32701','altamonte':'32701',
-  'longwood':'32750','apopka':'32703','celebration':'34747',
-  'clermont':'34711','ocala':'34470','fort myers':'33901',
-  'cape coral':'33904','west palm beach':'33401','palm beach gardens':'33410',
-  'jupiter':'33458','port st lucie':'34952','vero beach':'32960',
-  'melbourne':'32901','cocoa beach':'32931','titusville':'32780',
-  'palm bay':'32907','new smyrna beach':'32168','deland':'32720',
-  'leesburg':'34748','spring hill':'34608','new port richey':'34652',
-  'tarpon springs':'34689','dunedin':'34698','brandon':'33510',
-  'riverview':'33578','bradenton':'34201','venice':'34285',
-  'new york':'10001','los angeles':'90001','chicago':'60601',
-  'houston':'77001','phoenix':'85001','dallas':'75201',
-  'san antonio':'78201','austin':'78701','charlotte':'28201',
-  'atlanta':'30301','denver':'80201','seattle':'98101',
-  'boston':'02101','nashville':'37201','las vegas':'89101',
-  'portland':'97201','san diego':'92101','san francisco':'94101',
-  'san jose':'95101','raleigh':'27601','richmond':'23219',
-  'virginia beach':'23451','columbus':'43085','cleveland':'44101',
-  'cincinnati':'45202','minneapolis':'55401','st louis':'63101',
-  'kansas city':'64101','memphis':'38101','louisville':'40202',
-  'new orleans':'70112','salt lake city':'84101','tucson':'85701',
-  'albuquerque':'87101','philadelphia':'19101','detroit':'48201',
-  'baltimore':'21201','milwaukee':'53202','indianapolis':'46201',
-  'jacksonville fl':'32201','miami fl':'33101','tampa fl':'33601',
-  'orlando fl':'32801','fort lauderdale fl':'33301',
-};
-
-function formatArea(raw) {
-  const trimmed = raw.trim();
-  // Already a ZIP code — use as-is
-  if (/^[0-9]{5}$/.test(trimmed)) return trimmed;
-  // Check city lookup — return ZIP
-  const lower = trimmed.toLowerCase().replace(/\s*,\s*(fl|florida|tx|texas|ca|california|ny|new york|ga|georgia|nc|north carolina|va|virginia|oh|ohio|tn|tennessee|mn|minnesota|mo|missouri|la|louisiana|ut|utah|az|arizona|nm|new mexico|pa|pennsylvania|mi|michigan|md|maryland|wi|wisconsin|in|indiana)\s*$/i, '').trim();
-  if (CITY_ZIP[lower]) return CITY_ZIP[lower];
-  // Try with state suffix removed
-  const noState = trimmed.replace(/,?\s*[A-Z]{2}$/i, '').trim().toLowerCase();
-  if (CITY_ZIP[noState]) return CITY_ZIP[noState];
-  // Fallback — return original
-  return trimmed;
-}
-
 async function runSearch(){
-  const rawArea = document.getElementById('area-input').value.trim();
-  if(!rawArea){ toast('Please enter a ZIP code or city'); return; }
-  const area = formatArea(rawArea);
-  if(area !== rawArea) document.getElementById('area-input').value = area;
+  const area = document.getElementById('area-input').value.trim();
+  if(!area){ toast('Please enter a ZIP code or city'); return; }
 
   const btn = document.getElementById('search-btn');
   btn.disabled = true; btn.textContent = 'Searching...';
@@ -664,43 +619,6 @@ function applyFilter(){
   renderList();
 }
 
-// ─── LOYALTY SCORE ────────────────────────────────────
-function getLoyalty(r) {
-  const sold = r.sold || 0;
-  const listings = r.listings || 0;
-  const yrs = r.areas && r.areas.length > 2 ? 3 : r.areas && r.areas.length > 0 ? 2 : 1;
-
-  // High volume agents (50+ sold) likely have established LO relationships
-  // Very high listing:sold ratio = buyer side heavy = more flexible with LOs
-  // Lower sold count = newer or slower = more open to new LO partnerships
-
-  if (sold >= 50) {
-    return {
-      label: 'Likely Has Preferred LO',
-      tip: 'High producer — likely has an established lender. Come with a strong value prop.',
-      cls: 'loy-cold',
-      icon: '⚠️',
-      priority: 3
-    };
-  } else if (sold >= 20) {
-    return {
-      label: 'May Have Preferred LO',
-      tip: 'Solid producer — may have existing lender relationships but worth pursuing.',
-      cls: 'loy-warm',
-      icon: '🟡',
-      priority: 2
-    };
-  } else {
-    return {
-      label: 'Great Target',
-      tip: 'Growing agent — likely open to building new lender partnerships. High priority!',
-      cls: 'loy-hot',
-      icon: '🎯',
-      priority: 1
-    };
-  }
-}
-
 // ─── LIST ─────────────────────────────────────────────────
 function renderList(){
   const panel = document.getElementById('list-panel');
@@ -727,7 +645,6 @@ function renderList(){
           <span class="tag t1">${r.sold} sold</span>
           ${r.listings > 0 ? `<span class="tag t2">${r.listings} listings</span>` : ''}
           ${r.areas[0] ? `<span class="tag t3">${r.areas[0]}</span>` : ''}
-          <span class="tag loyalty-badge ${getLoyalty(r).cls}">${getLoyalty(r).icon} ${getLoyalty(r).label}</span>
         </div>
       </div>
       <div class="cs">
@@ -806,16 +723,6 @@ function renderDetail(r){
     </div>
     ${r.areas.length ? `<div class="ds"><div class="ds-title">Areas Served</div><div style="display:flex;gap:6px;flex-wrap:wrap">${r.areas.slice(0,4).map(a=>`<span class="tag t3">${a}</span>`).join('')}</div></div>` : ''}
     <div class="ds">
-      <div class="ds-title">Lender Loyalty Estimate</div>
-      <div style="background:#F5F3EF;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="tag loyalty-badge ${getLoyalty(r).cls}" style="font-size:11px;padding:4px 10px">${getLoyalty(r).icon} ${getLoyalty(r).label}</span>
-        </div>
-        <div style="font-size:12px;color:#5C4033;line-height:1.6">${getLoyalty(r).tip}</div>
-        <div style="font-size:10px;color:#9A9590;margin-top:2px">⚡ Est. based on production volume · Not official lender data</div>
-      </div>
-    </div>
-    <div class="ds">
       <div class="ds-title">Contact & Platforms</div>
       ${r.phone ? `<div class="crow"><span>📞</span><span>${r.phone}</span></div>` : ''}
       ${r.mobile ? `<div class="crow"><span>📱</span><span>${r.mobile}</span></div>` : ''}
@@ -843,7 +750,14 @@ function renderDetail(r){
         <button class="stab${scriptType[r.id]==='recent'?' on':''}" onclick="switchS(${r.id},'recent',this)">🏠 Recent Sales</button>
       </div>
       <div class="sbox" id="sbox-${r.id}" style="${scriptType[r.id]==='recent'?'padding:0;background:transparent;border:none;min-height:auto':''}">${scriptType[r.id]==='recent' ? recentSalesHTML(r) : script(r, scriptType[r.id])}</div>
-      ${scriptType[r.id]!=='recent' ? `<button class="cbtn" onclick="copyS(${r.id},'current')">Copy Script</button>` : ''}
+      ${scriptType[r.id]!=='recent' ? `<button class="cbtn" onclick="copyS(${r.id},'current')">Copy Script</button>
+      <div class="ai-improver" id="ai-improver-${r.id}">
+        <div class="ai-improver-row">
+          <input class="ai-input" id="ai-input-${r.id}" placeholder='e.g. "Make it more casual" or "Add urgency"' onkeydown="if(event.key==='Enter')improveScript(${r.id})">
+          <button class="ai-go-btn" id="ai-btn-${r.id}" onclick="improveScript(${r.id})">✨ Improve</button>
+        </div>
+        <div class="ai-status" id="ai-status-${r.id}">Claude is rewriting your script...</div>
+      </div>` : ''}
     </div>
     <div class="ds">
       <div class="ds-title">Relationship Status</div>
@@ -911,6 +825,48 @@ function copyS(id, typeArg){
   const r = realtors.find(x=>x.id===id); if(!r) return;
   const type = typeArg==='current' ? (scriptType[id]||'call') : typeArg;
   navigator.clipboard.writeText(script(r, type)).then(()=>toast('Script copied!')).catch(()=>toast('Script ready!'));
+}
+
+async function improveScript(id){
+  const r = realtors.find(x=>x.id===id); if(!r) return;
+  const type = scriptType[id] || 'call';
+  if(type==='recent') return;
+  const inputEl = document.getElementById('ai-input-'+id);
+  const btnEl = document.getElementById('ai-btn-'+id);
+  const statusEl = document.getElementById('ai-status-'+id);
+  const sbox = document.getElementById('sbox-'+id);
+  const instruction = inputEl.value.trim();
+  if(!instruction){ toast('Tell Claude how to improve the script first!'); inputEl.focus(); return; }
+  const currentScript = sbox.textContent;
+  btnEl.disabled = true;
+  statusEl.style.display = 'block';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{
+          role:'user',
+          content:`You are a sales coach for mortgage loan officers. Rewrite the following outreach script based on this instruction: "${instruction}"\n\nKeep it natural, concise, and effective for a loan officer recruiting a real estate agent as a referral partner. Return ONLY the rewritten script — no explanation, no intro, no quotes around it.\n\nOriginal script:\n${currentScript}`
+        }]
+      })
+    });
+    const data = await res.json();
+    const improved = data?.content?.[0]?.text;
+    if(improved){
+      sbox.textContent = improved;
+      inputEl.value = '';
+      toast('Script improved! ✨');
+    } else {
+      toast('Could not improve script. Try again.');
+    }
+  } catch(e){
+    toast('Connection error. Try again.');
+  }
+  btnEl.disabled = false;
+  statusEl.style.display = 'none';
 }
 
 function setSt(id, st){
