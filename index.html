@@ -451,26 +451,46 @@ document.getElementById('h-edit-btn').addEventListener('click', function(){
 // ─── SEARCH ───────────────────────────────────────────────
 document.getElementById('search-btn').addEventListener('click', runSearch);
 document.getElementById('area-input').addEventListener('keydown', function(e){ if(e.key==='Enter') runSearch(); });
-// ─── CITY TO ZIP (live geocoding) ────────────────────
+// ─── CITY TO ZIP ─────────────────────────────────────
+const STATE_ABBR = {
+  'alabama':'al','alaska':'ak','arizona':'az','arkansas':'ar','california':'ca',
+  'colorado':'co','connecticut':'ct','delaware':'de','florida':'fl','georgia':'ga',
+  'hawaii':'hi','idaho':'id','illinois':'il','indiana':'in','iowa':'ia','kansas':'ks',
+  'kentucky':'ky','louisiana':'la','maine':'me','maryland':'md','massachusetts':'ma',
+  'michigan':'mi','minnesota':'mn','mississippi':'ms','missouri':'mo','montana':'mt',
+  'nebraska':'ne','nevada':'nv','new hampshire':'nh','new jersey':'nj','new mexico':'nm',
+  'new york':'ny','north carolina':'nc','north dakota':'nd','ohio':'oh','oklahoma':'ok',
+  'oregon':'or','pennsylvania':'pa','rhode island':'ri','south carolina':'sc',
+  'south dakota':'sd','tennessee':'tn','texas':'tx','utah':'ut','vermont':'vt',
+  'virginia':'va','washington':'wa','west virginia':'wv','wisconsin':'wi','wyoming':'wy',
+  'dc':'dc','district of columbia':'dc'
+};
 async function formatArea(raw) {
   const trimmed = raw.trim();
-  // Already a ZIP — use as-is
   if (/^[0-9]{5}$/.test(trimmed)) return trimmed;
+  let city = trimmed;
+  let state = 'fl';
+  let hadState = false;
+  const commaMatch = trimmed.match(/^(.+?),\s*([A-Za-z\s]+)$/);
+  if (commaMatch) {
+    city = commaMatch[1].trim();
+    const stateRaw = commaMatch[2].trim().toLowerCase();
+    state = STATE_ABBR[stateRaw] || stateRaw.substring(0, 2).toLowerCase();
+    hadState = true;
+  }
+  const citySlug = city.toLowerCase().replace(/\s+/g, '-');
+  const stateSlug = state.toLowerCase().substring(0, 2);
   try {
-    // Strip state suffix for cleaner query
-    const cityOnly = trimmed.replace(/,?\s*([A-Z]{2}|florida|texas|california|georgia|carolina|virginia|ohio|tennessee|minnesota|missouri|louisiana|utah|arizona|mexico|pennsylvania|michigan|maryland|wisconsin|indiana|colorado|washington|oregon|nevada|alabama|kentucky|mississippi|oklahoma|kansas|nebraska|iowa|dakota|montana|wyoming|idaho|maine|hampshire|vermont|connecticut|island|delaware|hawaii|alaska)\s*$/i,'').trim();
-    const query = encodeURIComponent(cityOnly + ', USA');
-    const res = await fetch('https://nominatim.openstreetmap.org/search?q=' + query + '&format=json&addressdetails=1&limit=5&countrycodes=us', {
-      headers: { 'Accept-Language': 'en' }
-    });
+    const res = await fetch('https://api.zippopotam.us/us/' + stateSlug + '/' + citySlug);
     if (res.ok) {
-      const results = await res.json();
-      for (const place of results) {
-        const zip = place.address?.postcode?.split('-')[0];
-        if (zip && /^[0-9]{5}$/.test(zip)) return zip;
-      }
+      const data = await res.json();
+      const zip = data?.places?.[0]?.['post code'];
+      if (zip && /^[0-9]{5}$/.test(zip)) return zip;
     }
   } catch(e) {}
+  if (!hadState) {
+    toast('Try adding your state — e.g. "' + city + ', FL" or "' + city + ', TX"');
+  }
   return trimmed;
 }
 async function runSearch(){
@@ -1035,8 +1055,50 @@ document.getElementById('login-password').addEventListener('keydown', e => { if(
 document.getElementById('signup-confirm').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('signup-btn').click(); });
 document.getElementById('forgot-email').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('forgot-btn').click(); });
 document.getElementById('h-edit-btn').insertAdjacentHTML('afterend',
-  '<button class="h-edit" id="logout-btn" style="margin-left:4px">Log Out</button>'
+  '<button class="h-edit" id="logout-btn" style="margin-left:4px">Log Out</button>' +
+  '<button class="h-edit" id="help-btn" style="margin-left:4px;background:rgba(196,168,130,.2);border-color:rgba(196,168,130,.5)">&#10067; Help</button>'
 );
+document.getElementById('help-btn').addEventListener('click', function() {
+  const existing = document.getElementById('help-modal');
+  if (existing) { existing.remove(); return; }
+  const modal = document.createElement('div');
+  modal.id = 'help-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99998;display:flex;align-items:center;justify-content:center;padding:1rem';
+  modal.innerHTML = `
+    <div style="background:#FAFAF8;border-radius:20px;padding:2rem;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;position:relative">
+      <button onclick="document.getElementById('help-modal').remove()" style="position:absolute;top:1rem;right:1rem;background:#F5F3EF;border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px;">x</button>
+      <div style="font-family:'Playfair Display',serif;font-size:22px;color:#2C1810;margin-bottom:.25rem">How to Use RealtorHunter</div>
+      <div style="font-size:12px;color:#9A9590;margin-bottom:1.5rem">Your step-by-step guide</div>
+      <div style="display:flex;flex-direction:column;gap:1rem">
+        <div style="background:#F5F3EF;border-radius:12px;padding:1rem">
+          <div style="font-weight:600;color:#2C1810;margin-bottom:4px">Step 1 - Search Your Market</div>
+          <div style="font-size:13px;color:#5C4033;line-height:1.6">Enter a ZIP code (e.g. 32765) or City + State (e.g. Orlando, FL) in the search bar. Always include the state when typing a city. Then click Search Market.</div>
+        </div>
+        <div style="background:#F5F3EF;border-radius:12px;padding:1rem">
+          <div style="font-weight:600;color:#2C1810;margin-bottom:4px">Step 2 - Browse Top Realtors</div>
+          <div style="font-size:13px;color:#5C4033;line-height:1.6">Results show real top-producing agents from Realtor.com ranked by volume. Look at the Loyalty Badge - agents marked Great Target are most likely open to a new lender partnership.</div>
+        </div>
+        <div style="background:#F5F3EF;border-radius:12px;padding:1rem">
+          <div style="font-weight:600;color:#2C1810;margin-bottom:4px">Step 3 - Use Your Scripts</div>
+          <div style="font-size:13px;color:#5C4033;line-height:1.6">Click any agent card to open their profile. Use the Call, Voicemail, Text, or Email tabs to get a personalized script. Hit Copy Script to copy it instantly.</div>
+        </div>
+        <div style="background:#F5F3EF;border-radius:12px;padding:1rem">
+          <div style="font-weight:600;color:#2C1810;margin-bottom:4px">Step 4 - Improve with AI</div>
+          <div style="font-size:13px;color:#5C4033;line-height:1.6">Under any script, type an instruction like make it more casual or add urgency and click Improve. Claude AI will rewrite the script for you instantly.</div>
+        </div>
+        <div style="background:#F5F3EF;border-radius:12px;padding:1rem">
+          <div style="font-weight:600;color:#2C1810;margin-bottom:4px">Step 5 - Track Your Outreach</div>
+          <div style="font-size:13px;color:#5C4033;line-height:1.6">Use the Relationship Status buttons to mark agents as In Progress or Partner. Add notes after each call. Use the filter buttons at the top to view your pipeline.</div>
+        </div>
+        <div style="background:#EBF5FF;border-radius:12px;padding:1rem;border:1px solid #BBDEFB">
+          <div style="font-weight:600;color:#1565C0;margin-bottom:4px">Pro Tip</div>
+          <div style="font-size:13px;color:#1565C0;line-height:1.6">Click Recent Sales on any agent profile before you call - use their last sold neighborhood in your opener to instantly stand out!</div>
+        </div>
+      </div>
+    </div>`;
+  modal.addEventListener('click', function(e){ if(e.target===modal) modal.remove(); });
+  document.body.appendChild(modal);
+});
 document.getElementById('logout-btn').addEventListener('click', async function() {
   try { await supaAuth('logout', {}); } catch(e) {}
   clearToken();
