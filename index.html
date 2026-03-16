@@ -457,9 +457,9 @@ document.getElementById('area-input').addEventListener('keydown', function(e){ i
 function formatArea(raw) {
   const trimmed = raw.trim();
   if (/^[0-9]{5}$/.test(trimmed)) return trimmed;
+  // Just lowercase and remove optional trailing state (e.g. ", FL" or ", Tennessee")
   const lower = trimmed.toLowerCase()
-    .replace(/,?\s*[a-z]{2}$/i,'').trim()
-    .replace(/,?\s*(florida|texas|california|georgia|north carolina|south carolina|virginia|ohio|tennessee|minnesota|missouri|louisiana|utah|arizona|new mexico|pennsylvania|michigan|maryland|wisconsin|indiana|colorado|washington|oregon|nevada|alabama|kentucky|mississippi|oklahoma|kansas|nebraska|iowa|north dakota|south dakota|montana|wyoming|idaho|maine|new hampshire|vermont|connecticut|rhode island|delaware|hawaii|alaska|new york|new jersey)$/i,'').trim();
+    .replace(/,\s*(fl|florida|tx|texas|ca|california|ga|georgia|nc|north carolina|sc|south carolina|va|virginia|oh|ohio|tn|tennessee|mn|minnesota|mo|missouri|la|louisiana|ut|utah|az|arizona|nm|new mexico|pa|pennsylvania|mi|michigan|md|maryland|wi|wisconsin|in|indiana|co|colorado|wa|washington|or|oregon|nv|nevada|al|alabama|ky|kentucky|ms|mississippi|ok|oklahoma|ks|kansas|ne|nebraska|ia|iowa|nd|north dakota|sd|south dakota|mt|montana|wy|wyoming|id|idaho|me|maine|nh|new hampshire|vt|vermont|ct|connecticut|ri|rhode island|de|delaware|hi|hawaii|ak|alaska|ny|new york|nj|new jersey|il|illinois|wv|west virginia|ar|arkansas|dc)\s*$/i,'').trim();
   const CITIES = {
     // Florida
     'oviedo':'32765','orlando':'32801','miami':'33101','tampa':'33601','jacksonville':'32201',
