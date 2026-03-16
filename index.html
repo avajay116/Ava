@@ -198,6 +198,7 @@ body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size
       <div class="aw-logo-name">RealtorHunter</div>
     </div>
     <div class="aw-tagline">Find top-producing realtors. Build referral partnerships.</div>
+    <div style="font-size:11px;color:#8B6F47;background:#F5F3EF;border:1px solid #E8E5E0;border-radius:20px;padding:5px 14px;display:inline-block;margin-bottom:1rem;font-weight:500;">🌎 Covers 800+ top US markets across all 50 states</div>
     <!-- TABS -->
     <div class="aw-tabs">
       <button class="aw-tab on" id="tab-login" onclick="switchTab('login')">Sign In</button>
@@ -318,6 +319,7 @@ body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size
       </select>
     </div>
     <button class="s-btn" id="search-btn">Search Market ↗</button>
+    <div style="color:#C4A882;font-size:11px;align-self:flex-end;padding-bottom:10px;white-space:nowrap;">🌎 800+ Cities Nationwide</div>
   </div>
   <div class="stats-bar">
     <div class="stat"><div class="stat-n" id="s-total">—</div><div class="stat-l">Found</div></div>
@@ -452,55 +454,230 @@ document.getElementById('h-edit-btn').addEventListener('click', function(){
 document.getElementById('search-btn').addEventListener('click', runSearch);
 document.getElementById('area-input').addEventListener('keydown', function(e){ if(e.key==='Enter') runSearch(); });
 // ─── CITY TO ZIP ─────────────────────────────────────
-const STATE_ABBR = {
-  'alabama':'al','alaska':'ak','arizona':'az','arkansas':'ar','california':'ca',
-  'colorado':'co','connecticut':'ct','delaware':'de','florida':'fl','georgia':'ga',
-  'hawaii':'hi','idaho':'id','illinois':'il','indiana':'in','iowa':'ia','kansas':'ks',
-  'kentucky':'ky','louisiana':'la','maine':'me','maryland':'md','massachusetts':'ma',
-  'michigan':'mi','minnesota':'mn','mississippi':'ms','missouri':'mo','montana':'mt',
-  'nebraska':'ne','nevada':'nv','new hampshire':'nh','new jersey':'nj','new mexico':'nm',
-  'new york':'ny','north carolina':'nc','north dakota':'nd','ohio':'oh','oklahoma':'ok',
-  'oregon':'or','pennsylvania':'pa','rhode island':'ri','south carolina':'sc',
-  'south dakota':'sd','tennessee':'tn','texas':'tx','utah':'ut','vermont':'vt',
-  'virginia':'va','washington':'wa','west virginia':'wv','wisconsin':'wi','wyoming':'wy',
-  'dc':'dc','district of columbia':'dc'
-};
-async function formatArea(raw) {
+function formatArea(raw) {
   const trimmed = raw.trim();
   if (/^[0-9]{5}$/.test(trimmed)) return trimmed;
-  let city = trimmed;
-  let state = 'fl';
-  let hadState = false;
-  const commaMatch = trimmed.match(/^(.+?),\s*([A-Za-z\s]+)$/);
-  if (commaMatch) {
-    city = commaMatch[1].trim();
-    const stateRaw = commaMatch[2].trim().toLowerCase();
-    state = STATE_ABBR[stateRaw] || stateRaw.substring(0, 2).toLowerCase();
-    hadState = true;
-  }
-  const citySlug = city.toLowerCase().replace(/\s+/g, '-');
-  const stateSlug = state.toLowerCase().substring(0, 2);
-  try {
-    const res = await fetch('https://api.zippopotam.us/us/' + stateSlug + '/' + citySlug);
-    if (res.ok) {
-      const data = await res.json();
-      const zip = data?.places?.[0]?.['post code'];
-      if (zip && /^[0-9]{5}$/.test(zip)) return zip;
-    }
-  } catch(e) {}
-  if (!hadState) {
-    toast('Try adding your state — e.g. "' + city + ', FL" or "' + city + ', TX"');
-  }
+  const lower = trimmed.toLowerCase()
+    .replace(/,?\s*[a-z]{2}$/i,'').trim()
+    .replace(/,?\s*(florida|texas|california|georgia|north carolina|south carolina|virginia|ohio|tennessee|minnesota|missouri|louisiana|utah|arizona|new mexico|pennsylvania|michigan|maryland|wisconsin|indiana|colorado|washington|oregon|nevada|alabama|kentucky|mississippi|oklahoma|kansas|nebraska|iowa|north dakota|south dakota|montana|wyoming|idaho|maine|new hampshire|vermont|connecticut|rhode island|delaware|hawaii|alaska|new york|new jersey)$/i,'').trim();
+  const CITIES = {
+    // Florida
+    'oviedo':'32765','orlando':'32801','miami':'33101','tampa':'33601','jacksonville':'32201',
+    'st pete':'33701','saint pete':'33701','st. pete':'33701','st petersburg':'33701',
+    'naples':'34101','fort lauderdale':'33301','boca raton':'33431','sarasota':'34230',
+    'clearwater':'33755','gainesville':'32601','tallahassee':'32301','pensacola':'32501',
+    'daytona beach':'32114','daytona':'32114','kissimmee':'34741','winter park':'32789',
+    'lake mary':'32746','sanford':'32771','deltona':'32725','altamonte springs':'32701',
+    'altamonte':'32701','longwood':'32750','apopka':'32703','celebration':'34747',
+    'clermont':'34711','ocala':'34470','fort myers':'33901','cape coral':'33904',
+    'west palm beach':'33401','palm beach gardens':'33410','jupiter':'33458',
+    'port st lucie':'34952','port saint lucie':'34952','vero beach':'32960',
+    'melbourne':'32901','cocoa beach':'32931','titusville':'32780','palm bay':'32907',
+    'new smyrna beach':'32168','deland':'32720','leesburg':'34748','spring hill':'34608',
+    'new port richey':'34652','tarpon springs':'34689','dunedin':'34698',
+    'brandon':'33510','riverview':'33578','bradenton':'34201','venice':'34285',
+    'winter garden':'34787','winter springs':'32708','casselberry':'32707',
+    'windermere':'34786','lake nona':'32827','st cloud':'34769','saint cloud':'34769',
+    'haines city':'33844','davenport':'33837','poinciana':'34759','sebring':'33870',
+    'the villages':'32159','palm coast':'32137','ormond beach':'32174',
+    'port orange':'32129','edgewater':'32132','ponte vedra':'32082',
+    'fleming island':'32003','orange park':'32073','fernandina beach':'32034',
+    'homestead':'33030','hialeah':'33010','coral springs':'33065',
+    'pompano beach':'33060','deerfield beach':'33441','delray beach':'33444',
+    'boynton beach':'33435','lake worth':'33460','wellington':'33414',
+    'royal palm beach':'33411','miami beach':'33139','coral gables':'33134',
+    'doral':'33178','kendall':'33156','pembroke pines':'33024','miramar':'33025',
+    'weston':'33326','davie':'33314','plantation':'33317','lauderhill':'33311',
+    'sunrise':'33323','margate':'33063','coconut creek':'33073',
+    'north miami':'33161','aventura':'33180','hallandale beach':'33009',
+    'hallandale':'33009','lakeland':'33801','ocala':'34470','gainesville':'32601',
+    // Georgia
+    'atlanta':'30301','savannah':'31401','augusta':'30901','columbus ga':'31901',
+    'macon':'31201','athens':'30601','roswell':'30075','sandy springs':'30328',
+    'johns creek':'30097','alpharetta':'30004','marietta':'30060','smyrna ga':'30080',
+    'peachtree city':'30269','brookhaven':'30319','dunwoody':'30338',
+    // Texas
+    'houston':'77001','dallas':'75201','san antonio':'78201','austin':'78701',
+    'fort worth':'76101','el paso':'79901','arlington tx':'76001','corpus christi':'78401',
+    'plano':'75023','laredo':'78040','lubbock':'79401','garland':'75040',
+    'irving':'75061','frisco':'75034','mckinney':'75069','grand prairie':'75050',
+    'amarillo':'79101','brownsville':'78520','pasadena tx':'77501','mesquite':'75149',
+    'killeen':'76541','mcallen':'78501','waco':'76701','carrollton':'75006',
+    'midland tx':'79701','round rock':'78664','denton':'76201','abilene':'79601',
+    'beaumont':'77701','sugar land':'77478','league city':'77573','tyler':'75701',
+    'odessa':'79761','allen':'75013','college station':'77840','pearland':'77581',
+    // California
+    'los angeles':'90001','san diego':'92101','san jose':'95101','san francisco':'94101',
+    'fresno':'93701','sacramento':'95814','long beach':'90801','oakland':'94601',
+    'bakersfield':'93301','anaheim':'92801','santa ana':'92701','riverside':'92501',
+    'stockton':'95201','chula vista':'91910','irvine':'92602','fremont':'94536',
+    'san bernardino':'92401','modesto':'95351','fontana':'92335','moreno valley':'92551',
+    'glendale ca':'91201','huntington beach':'92647','santa clarita':'91350',
+    'garden grove':'92840','santa rosa':'95401','oceanside':'92054','elk grove':'95624',
+    'corona':'92879','salinas':'93901','pomona':'91766','escondido':'92025',
+    'torrance':'90501','hayward':'94541','sunnyvale':'94086','pasadena ca':'91101',
+    'beverly hills':'90210','santa monica':'90401','burbank':'91501',
+    'compton':'90220','inglewood':'90301','downey':'90241','costa mesa':'92626',
+    // New York
+    'new york':'10001','nyc':'10001','brooklyn':'11201','bronx':'10451',
+    'queens':'11354','staten island':'10301','buffalo':'14201','rochester':'14601',
+    'yonkers':'10701','syracuse':'13201','albany':'12201','new rochelle':'10801',
+    'mount vernon':'10550','schenectady':'12301','utica':'13501',
+    // Illinois
+    'chicago':'60601','aurora il':'60505','joliet':'60431','naperville':'60540',
+    'rockford':'61101','springfield il':'62701','elgin':'60120','peoria':'61602',
+    'champaign':'61820','waukegan':'60085',
+    // Pennsylvania
+    'philadelphia':'19101','pittsburgh':'15201','allentown':'18101',
+    'erie':'16501','reading':'19601','scranton':'18501','bethlehem pa':'18015',
+    'lancaster':'17601','harrisburg':'17101','york pa':'17401',
+    // Arizona
+    'phoenix':'85001','tucson':'85701','mesa':'85201','chandler':'85224',
+    'scottsdale':'85251','gilbert':'85233','tempe':'85281','peoria az':'85345',
+    'surprise':'85374','glendale az':'85301','avondale':'85323','goodyear':'85338',
+    'flagstaff':'86001','yuma':'85364','buckeye':'85326',
+    // North Carolina
+    'charlotte':'28201','raleigh':'27601','greensboro':'27401','durham':'27701',
+    'winston-salem':'27101','winston salem':'27101','fayetteville nc':'28301',
+    'cary':'27511','wilmington nc':'28401','high point':'27260','concord nc':'28025',
+    'asheville':'28801','gastonia':'28052','chapel hill':'27514',
+    // Ohio
+    'columbus':'43085','cleveland':'44101','cincinnati':'45202','toledo':'43601',
+    'akron':'44301','dayton':'45401','parma':'44129','canton':'44701',
+    'youngstown':'44501','lorain':'44052','hamilton oh':'45011',
+    // Michigan
+    'detroit':'48201','grand rapids':'49501','warren':'48089','sterling heights':'48310',
+    'lansing':'48901','ann arbor':'48101','flint':'48501','dearborn':'48120',
+    'livonia':'48150','clinton township':'48035',
+    // Washington
+    'seattle':'98101','spokane':'99201','tacoma':'98401','vancouver wa':'98660',
+    'bellevue':'98004','kent':'98031','everett':'98201','renton':'98055',
+    'kirkland':'98033','redmond':'98052','sammamish':'98075','federal way':'98003',
+    // Colorado
+    'denver':'80201','colorado springs':'80901','aurora co':'80010','fort collins':'80521',
+    'lakewood':'80226','thornton':'80229','arvada':'80001','westminster co':'80030',
+    'pueblo':'81001','boulder':'80301','highlands ranch':'80129','greeley':'80631',
+    // Tennessee
+    'nashville':'37201','memphis':'38101','knoxville':'37901','chattanooga':'37401',
+    'clarksville':'37040','murfreesboro':'37127','franklin tn':'37064',
+    'jackson tn':'38301','johnson city':'37601','bartlett':'38133',
+    // Virginia
+    'virginia beach':'23451','norfolk':'23501','chesapeake':'23320','richmond':'23219',
+    'newport news':'23601','alexandria':'22301','hampton':'23661','roanoke':'24011',
+    'portsmouth va':'23701','suffolk':'23434',
+    // New Jersey
+    'newark':'07101','jersey city':'07302','paterson':'07501','elizabeth':'07201',
+    'trenton':'08601','camden':'08101','clifton':'07011','toms river':'08753',
+    // Maryland
+    'baltimore':'21201','silver spring':'20901','dundalk':'21222','wheaton':'20902',
+    'columbia md':'21044','ellicott city':'21041','germantown':'20874',
+    'bethesda':'20814','rockville':'20850','frederick':'21701','gaithersburg':'20877',
+    // Massachusetts
+    'boston':'02101','worcester':'01601','springfield ma':'01101','lowell':'01851',
+    'cambridge':'02139','new bedford':'02740','brockton':'02301','quincy':'02169',
+    'lynn':'01901','fall river':'02720',
+    // Indiana
+    'indianapolis':'46201','fort wayne':'46801','evansville':'47701',
+    'south bend':'46601','carmel':'46032','fishers':'46037','bloomington in':'47401',
+    'hammond':'46320','gary':'46401','muncie':'47302',
+    // Missouri
+    'kansas city':'64101','st louis':'63101','saint louis':'63101',
+    'springfield mo':'65801','columbia mo':'65201','independence':'64050',
+    'lees summit':'64063','ofallon':'63366','st joseph':'64501','st charles':'63301',
+    // Nevada
+    'las vegas':'89101','henderson':'89002','reno':'89501','north las vegas':'89030',
+    'sparks':'89431','carson city':'89701',
+    // Minnesota
+    'minneapolis':'55401','saint paul':'55101','st paul':'55101',
+    'rochester mn':'55901','duluth':'55801','bloomington mn':'55420',
+    'brooklyn park':'55443','plymouth mn':'55441','maple grove':'55311',
+    // Wisconsin
+    'milwaukee':'53202','madison':'53701','green bay':'54301','kenosha':'53140',
+    'racine':'53401','appleton':'54911','waukesha':'53186','oshkosh':'54901',
+    // South Carolina
+    'columbia sc':'29201','charleston':'29401','north charleston':'29405',
+    'mount pleasant':'29464','rock hill':'29730','greenville sc':'29601',
+    'summerville':'29483','goose creek':'29445','hilton head':'29926',
+    'hilton head island':'29926','myrtle beach':'29577','spartanburg':'29301',
+    // Louisiana
+    'new orleans':'70112','baton rouge':'70801','shreveport':'71101',
+    'metairie':'70001','lafayette la':'70501','lake charles':'70601',
+    'kenner':'70062','bossier city':'71111',
+    // Kentucky
+    'louisville':'40202','lexington':'40507','bowling green':'42101',
+    'owensboro':'42301','covington ky':'41011',
+    // Oregon
+    'portland':'97201','eugene':'97401','salem':'97301','gresham':'97030',
+    'hillsboro':'97123','beaverton':'97005','bend':'97701','medford':'97501',
+    // Oklahoma
+    'oklahoma city':'73101','tulsa':'74101','norman':'73069','broken arrow':'74012',
+    'lawton':'73501','edmond':'73003','moore':'73160','midwest city':'73110',
+    // Connecticut
+    'bridgeport':'06601','new haven':'06501','hartford':'06101','stamford':'06901',
+    'waterbury':'06701','norwalk':'06851','danbury':'06810',
+    // Utah
+    'salt lake city':'84101','west valley city':'84120','provo':'84601',
+    'west jordan':'84084','orem':'84057','sandy ut':'84070','ogden':'84401',
+    'st george':'84770','saint george':'84770','layton':'84041',
+    // Mississippi
+    'jackson ms':'39201','gulfport':'39501','southaven':'38671','hattiesburg':'39401',
+    'biloxi':'39530','meridian':'39301',
+    // Arkansas
+    'little rock':'72201','fort smith':'72901','fayetteville ar':'72701',
+    'springdale':'72764','jonesboro':'72401',
+    // Kansas
+    'wichita':'67201','overland park':'66202','kansas city ks':'66101',
+    'topeka':'66601','olathe':'66061',
+    // Nebraska
+    'omaha':'68101','lincoln ne':'68501',
+    // New Mexico
+    'albuquerque':'87101','las cruces':'88001','rio rancho':'87124','santa fe':'87501',
+    // West Virginia
+    'charleston wv':'25301','huntington wv':'25701',
+    // Idaho
+    'boise':'83701','nampa':'83651','meridian id':'83642','idaho falls':'83401',
+    'pocatello':'83201',
+    // Hawaii
+    'honolulu':'96801','hilo':'96720','kailua':'96734','pearl city':'96782',
+    // New Hampshire
+    'manchester nh':'03101','nashua':'03060','concord nh':'03301',
+    // Maine
+    'portland me':'04101','lewiston':'04240','bangor':'04401',
+    // Rhode Island
+    'providence':'02901','cranston':'02910','warwick':'02886','pawtucket':'02860',
+    // Montana
+    'billings':'59101','missoula':'59801','great falls':'59401','bozeman':'59715',
+    // Delaware
+    'wilmington de':'19801','dover':'19901',
+    // South Dakota
+    'sioux falls':'57101','rapid city':'57701',
+    // North Dakota
+    'fargo':'58101','bismarck':'58501',
+    // Alaska
+    'anchorage':'99501','fairbanks':'99701','juneau':'99801',
+    // Wyoming
+    'cheyenne':'82001','casper':'82601',
+    // Vermont
+    'burlington vt':'05401','montpelier':'05601',
+    // Washington DC
+    'washington dc':'20001','dc':'20001',
+    // Generic
+    'washington':'20001'
+  };
+  // Direct lookup
+  if (CITIES[lower]) return CITIES[lower];
+  // Try without trailing state abbr (e.g. "orlando fl" -> "orlando")
+  const noState = lower.replace(/\s+[a-z]{2}$/, '').trim();
+  if (CITIES[noState]) return CITIES[noState];
   return trimmed;
 }
 async function runSearch(){
   const rawArea = document.getElementById('area-input').value.trim();
   if(!rawArea){ toast('Please enter a ZIP code or city'); return; }
   const btn = document.getElementById('search-btn');
-  btn.disabled = true; btn.textContent = 'Looking up city...';
-  const area = await formatArea(rawArea);
+  btn.disabled = true; btn.textContent = 'Searching...';
+  const area = formatArea(rawArea);
   if(area !== rawArea) document.getElementById('area-input').value = area;
-  btn.textContent = 'Searching...';
   const cached = getCache(area.toLowerCase());
   if(cached){
     realtors = cached;
