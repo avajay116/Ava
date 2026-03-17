@@ -264,6 +264,8 @@ body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size
       <input class="aw-input" id="signup-password" type="password" placeholder="Min 6 characters">
       <label class="aw-label">Confirm Password</label>
       <input class="aw-input" id="signup-confirm" type="password" placeholder="Repeat password">
+      <label class="aw-label">Promo Code <span style="color:#9A9590;font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+      <input class="aw-input" id="signup-promo" type="text" placeholder="Enter promo code" style="text-transform:uppercase;letter-spacing:.05em">
       <button class="aw-btn" id="signup-btn">Continue to Payment →</button>
       <div class="aw-loading" id="signup-loading">Creating your account...</div>
       <div class="aw-secure">🔒 Secured by Stripe. Cancel anytime.</div>
@@ -1979,7 +1981,9 @@ document.getElementById('signup-btn').addEventListener('click', async function()
   try {
     const data = await supaAuth('signup', { email, password });
     if (data.id || data.user?.id) {
-      const stripeUrl = STRIPE_LINK + '?prefilled_email=' + encodeURIComponent(email);
+      const promo = (document.getElementById('signup-promo').value || '').trim().toUpperCase();
+      let stripeUrl = STRIPE_LINK + '?prefilled_email=' + encodeURIComponent(email);
+      if (promo) stripeUrl += '&prefilled_promo_code=' + encodeURIComponent(promo);
       showSucc('✅ Account created! Redirecting to payment...');
       document.getElementById('signup-loading').textContent = 'Redirecting to Stripe...';
       setTimeout(() => { window.location.href = stripeUrl; }, 1500);
