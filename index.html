@@ -198,7 +198,7 @@ body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size
       <div class="aw-logo-name">RealtorHunter</div>
     </div>
     <div class="aw-tagline">Find top-producing realtors. Build referral partnerships.</div>
-    <div style="font-size:11px;color:#8B6F47;background:#F5F3EF;border:1px solid #E8E5E0;border-radius:20px;padding:5px 14px;display:inline-block;font-weight:500;">🌎 Covers 800+ top US markets across all 50 states</div>
+    <div style="font-size:11px;color:#8B6F47;background:#F5F3EF;border:1px solid #E8E5E0;border-radius:20px;padding:5px 14px;display:inline-block;font-weight:500;">🌎 Covers all US markets — search by ZIP code</div>
     <div style="margin-bottom:1rem;margin-top:6px;">
       <button onclick="document.getElementById('city-list-modal').style.display='flex'" style="background:transparent;border:none;color:#8B6F47;font-size:11px;cursor:pointer;text-decoration:underline;font-family:'DM Sans',sans-serif;">View all supported cities →</button>
     </div>
@@ -206,7 +206,7 @@ body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size
       <div style="background:#FAFAF8;border-radius:20px;padding:2rem;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;position:relative;">
         <button onclick="document.getElementById('city-list-modal').style.display='none'" style="position:absolute;top:1rem;right:1rem;background:#F5F3EF;border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:14px;font-family:'DM Sans',sans-serif;">✕</button>
         <div style="font-family:'Playfair Display',serif;font-size:20px;color:#2C1810;margin-bottom:4px;">Supported Cities</div>
-        <div style="font-size:12px;color:#9A9590;margin-bottom:1.25rem;">Search by city name or ZIP code. Always include state for best results (e.g. Orlando, FL)</div>
+        <div style="font-size:12px;color:#9A9590;margin-bottom:1.25rem;">Search by ZIP code for best results. Use Google Maps to find your ZIP.</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
           <div><div style="font-weight:700;color:#2C1810;font-size:12px;margin-bottom:6px;border-bottom:1px solid #E8E5E0;padding-bottom:4px;">🌴 Florida</div><div style="font-size:11px;color:#5C4033;line-height:1.9;">Oviedo · Orlando · Miami · Tampa · Jacksonville · St Petersburg · Naples · Fort Lauderdale · Boca Raton · Sarasota · Clearwater · Gainesville · Tallahassee · Pensacola · Daytona Beach · Kissimmee · Winter Park · Lake Mary · Sanford · Deltona · Altamonte Springs · Longwood · Apopka · Celebration · Clermont · Ocala · Fort Myers · Cape Coral · West Palm Beach · Palm Beach Gardens · Jupiter · Port St Lucie · Vero Beach · Melbourne · Cocoa Beach · Titusville · Palm Bay · New Smyrna Beach · Deland · Leesburg · Spring Hill · New Port Richey · Tarpon Springs · Dunedin · Brandon · Riverview · Bradenton · Venice · Winter Garden · Winter Springs · Casselberry · Windermere · Lake Nona · St Cloud · Haines City · Davenport · Sebring · The Villages · Palm Coast · Ormond Beach · Port Orange · Ponte Vedra · Fleming Island · Orange Park · Fernandina Beach · Homestead · Hialeah · Coral Springs · Pompano Beach · Deerfield Beach · Delray Beach · Boynton Beach · Lake Worth · Wellington · Royal Palm Beach · Miami Beach · Coral Gables · Doral · Kendall · Pembroke Pines · Miramar · Weston · Davie · Plantation · Lauderhill · Sunrise · Margate · Coconut Creek · North Miami · Aventura · Hallandale Beach · Lakeland · Bonita Springs · Marco Island · Key West · Punta Gorda · Port Charlotte · Palm Harbor · Safety Harbor · Land O Lakes · Wesley Chapel · Zephyrhills · Plant City</div></div>
           <div><div style="font-weight:700;color:#2C1810;font-size:12px;margin-bottom:6px;border-bottom:1px solid #E8E5E0;padding-bottom:4px;">🍑 Georgia</div><div style="font-size:11px;color:#5C4033;line-height:1.9;">Atlanta · Savannah · Augusta · Columbus · Macon · Athens · Roswell · Sandy Springs · Johns Creek · Alpharetta · Marietta · Smyrna · Peachtree City · Brookhaven · Dunwoody · Warner Robins · Valdosta · Albany · Gainesville · Kennesaw · Woodstock · Canton · Rome · Dalton · Newnan · Douglasville · Lawrenceville · Duluth · Cumming · Carrollton · Griffin · Stockbridge</div>
@@ -326,8 +326,8 @@ body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size
   </div>
   <div class="search-bar">
     <div class="s-group grow">
-      <span class="s-label">ZIP Code or City</span>
-      <input class="s-input" id="area-input" placeholder="e.g. 32765 or Orlando, FL">
+      <span class="s-label">ZIP Code</span>
+      <input class="s-input" id="area-input" placeholder="Enter ZIP code — e.g. 32765">
     </div>
     <div class="s-group fixed">
       <span class="s-label">Results</span>
