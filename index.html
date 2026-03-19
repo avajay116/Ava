@@ -303,7 +303,7 @@ body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size
     <label class="ob-label">Your First Name</label>
     <input class="ob-input" id="ob-fname" placeholder="e.g. Ava" maxlength="40">
     <label class="ob-label">Your Company / Mortgage Team</label>
-    <input class="ob-input" id="ob-company" placeholder="e.g. Novus Home Mortgage" maxlength="60">
+    <input class="ob-input" id="ob-company" placeholder="e.g. Home Mortgage" maxlength="60">
     <label class="ob-label">Your Title (optional)</label>
     <input class="ob-input" id="ob-title" placeholder="e.g. Loan Officer" maxlength="40">
     <button id="ob-btn">Get Started →</button>
@@ -331,7 +331,7 @@ body{font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1A1A1A;font-size
   <div class="search-bar">
     <div class="s-group grow">
       <span class="s-label">ZIP Code</span>
-      <input class="s-input" id="area-input" placeholder="Enter ZIP code — e.g. 32765">
+      <input class="s-input" id="area-input" placeholder="Enter ZIP code — e.g. 98052">
     </div>
     <div class="s-group fixed">
       <span class="s-label">Results</span>
@@ -1527,7 +1527,7 @@ async function runSearch(){
     page = 1; selectedId = null; activeFilter = 'all';
     updateStats(); buildFilters(); applyFilter(); renderDetail(null);
   } catch(err){
-    document.getElementById('list-panel').innerHTML = '<div class="err"><div style="font-size:28px;margin-bottom:.75rem">⚠️</div><div style="font-family:\'Playfair Display\',serif;font-size:15px;color:#C0392B;margin-bottom:6px">Search Failed</div><div style="font-size:13px;color:#666;line-height:1.8">' + err.message + '<br><br><strong>Tips:</strong><br>• Use a ZIP code (e.g. 32765)<br>• Use City + State (e.g. Nashville, TN)<br>• Search by city, not state name</div></div>';
+    document.getElementById('list-panel').innerHTML = '<div class="err"><div style="font-size:28px;margin-bottom:.75rem">⚠️</div><div style="font-family:\'Playfair Display\',serif;font-size:15px;color:#C0392B;margin-bottom:6px">Search Failed</div><div style="font-size:13px;color:#666;line-height:1.8">' + err.message + '<br><br><strong>Tips:</strong><br>• Use a ZIP code (e.g. 98052)<br>• Use City + State (e.g. Nashville, TN)<br>• Search by city, not state name</div></div>';
   }
   btn.disabled = false; btn.textContent = 'Search Market ↗';
 }
@@ -2034,7 +2034,7 @@ document.getElementById('help-btn').addEventListener('click', function() {
       <div style="display:flex;flex-direction:column;gap:1rem">
         <div style="background:#F5F3EF;border-radius:12px;padding:1rem">
           <div style="font-weight:600;color:#2C1810;margin-bottom:4px">Step 1 - Search Your Market</div>
-          <div style="font-size:13px;color:#5C4033;line-height:1.6">Enter your ZIP code (e.g. 32765) in the search bar and click Search Market.</div>
+          <div style="font-size:13px;color:#5C4033;line-height:1.6">Enter your ZIP code (e.g. 98052) in the search bar and click Search Market.</div>
         </div>
         <div style="background:#F5F3EF;border-radius:12px;padding:1rem">
           <div style="font-weight:600;color:#2C1810;margin-bottom:4px">Step 2 - Browse Top Realtors</div>
